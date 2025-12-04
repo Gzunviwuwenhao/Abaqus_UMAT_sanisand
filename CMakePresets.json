@@ -1,0 +1,65 @@
+{
+  "version": 4,
+  "configurePresets": [
+    {
+      "name": "vs2015-release",
+      "displayName": "Visual Studio 2015 Release",
+      "generator": "Visual Studio 14 2015",
+      "binaryDir": "${sourceDir}/build-vs2015",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION": "10.0.22621.0",
+        "CMAKE_SYSTEM_VERSION": "10.0.22621.0",
+        "CMAKE_Fortran_COMPILER": "E:/IntelSWTools/compilers_and_libraries_2016.1.146/windows/bin/intel64/ifort.exe"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      }
+    },
+    {
+      "name": "ninja-debug",
+      "displayName": "Ninja Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_Fortran_COMPILER": "gfortran"
+      }
+    },
+    {
+      "name": "vs2022-release",
+      "displayName": "Visual Studio 2022 Release",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build-vs2022",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION": "10.0.22621.0",
+        "CMAKE_SYSTEM_VERSION": "10.0.22621.0",
+        "CMAKE_Fortran_COMPILER": "E:/oneapi2022/compiler/2022.2.1/windows/bin/intel64/ifort.exe"
+      },
+      "toolset": {
+        "value": "v143",
+        "strategy": "external"
+      },
+      "architecture": "x64"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "vs2022-release-build",
+      "configurePreset": "vs2022-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "vs2015-release-build",
+      "configurePreset": "vs2015-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "ninja-debug",
+      "configurePreset": "ninja-debug",
+      "configuration": "debug"
+    }
+  ]
+}

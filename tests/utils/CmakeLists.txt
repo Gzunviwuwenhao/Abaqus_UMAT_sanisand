@@ -1,0 +1,35 @@
+# tests/unit/CMakeLists.txt
+# create project
+project(test_utils)
+
+# 如果存在测试文件，创建测试可执行文件
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR} AND NOT CMAKE_CONFIGURATION_TYPES)
+  # 查找所有测试源文件
+
+  # 创建测试可执行文件
+  add_executable(${PROJECT_NAME} test.f90)
+
+  target_include_directories(${PROJECT_NAME}
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_Fortran_MODULE_DIRECTORY}>
+  )
+
+  # 根据编译器设置要链接的库
+  if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+    set(FORTRAN_COMPILER_LIBS gfortran)
+  elseif(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
+    set(FORTRAN_COMPILER_LIBS ifort)
+  else()
+    set(FORTRAN_COMPILER_LIBS "") # 其他编译器可能不需要特殊库
+  endif()
+
+  # 链接库
+  target_link_libraries(${PROJECT_NAME} PRIVATE
+    myutils
+    pthread
+    ${FORTRAN_COMPILER_LIBS}
+  )
+
+  # 添加测试
+  add_test(NAME ${PROJECT_NAME} COMMAND ${PROJECT_NAME})
+endif()

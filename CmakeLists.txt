@@ -1,0 +1,50 @@
+# 指定Cmake的最低版本
+cmake_minimum_required(VERSION 3.10)
+
+# set Camke standard to be 14
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS -std=c++14)
+
+# 打印所选编译器
+message(STATUS "Fortran compiler: ${CMAKE_Fortran_COMPILER}")
+
+# 定义项目名称和使用的语言
+project(umat_main LANGUAGES Fortran CXX)
+
+# 根据实际使用的编译器设置选项
+if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+  # 使能GNU标准安装目录变量CXX
+  include(GNUInstallDirs)
+
+  # gfortran 特定选项
+  set(Fortran_FLAGS_COMMON "-cpp -fbacktrace")
+  set(CMAKE_Fortran_FLAGS_DEBUG "-g -O0 ${Fortran_FLAGS_COMMON}")
+  set(CMAKE_Fortran_FLAGS_RELEASE "-O2 ${Fortran_FLAGS_COMMON}")
+elseif(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
+  # ifort 特定选项
+  set(Fortran_FLAGS_COMMON "-fpp -traceback")
+  set(CMAKE_Fortran_FLAGS_DEBUG "-debug:full -O0 ${Fortran_FLAGS_COMMON}")
+  set(CMAKE_Fortran_FLAGS_RELEASE "-O2 ${Fortran_FLAGS_COMMON}")
+endif()
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/include)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# set path
+set(UMAT_DIR ${CMAKE_SOURCE_DIR}/src/umat)
+set(UTILS_DIR ${CMAKE_SOURCE_DIR}/src/utils)
+set(UPDATE_DIR ${CMAKE_SOURCE_DIR}/src/update)
+
+# define target and sources
+add_subdirectory(src/utils)
+add_subdirectory(src/app)
+add_subdirectory(src/update)
+
+# enable testing and define tests
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/tests AND IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+  enable_testing()
+  add_subdirectory(tests/utils)
+endif()

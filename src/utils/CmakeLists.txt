@@ -1,0 +1,23 @@
+# project name
+project(myutils)
+
+# library
+add_library(${PROJECT_NAME}
+  include/base_config.F90
+  include/exception.F90
+  include/material_config.F90
+  include/tensor_opt.F90
+  include/preprocess.F90
+  src/tensor_opt_impl.F90
+  src/exception_impl.F90
+  src/preprocess_impl.F90
+)
+# Add module directory to include path
+target_include_directories(${PROJECT_NAME}
+    PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY}
+)
+
+# Set module output directory explicitly
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}
+)
