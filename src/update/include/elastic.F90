@@ -8,9 +8,9 @@
 !> @date 2025/12/02
 !*****************************************************************************
 module elastic_mod
+  use Base_config, only: DP
   implicit none
   private
-  ! Type definitions
   !---------------------------------------------------------------------------
   !> @brief ela_opt
   !>
@@ -19,26 +19,25 @@ module elastic_mod
   !> @author wuwenhao
   !> @date 2025/12/02
   !---------------------------------------------------------------------------
-  type, public :: elast
+  type, public :: Elast
   contains
-    procedure, public, nopass :: interpolate => interpolate_impl
-    procedure, public, nopass :: isyield => isyield_impl
-    procedure, public, nopass :: get_stiffness => get_stiffness_impl
-    procedure, public, nopass :: update_voidr => update_voidr_impl
-  endtype elast
+    procedure, public, nopass :: Get_gtheta => Get_gtheta_impl
+    procedure, public, nopass :: Get_pfratio => Get_pfratio_impl
+    procedure, public, nopass :: Yield_distance => yield_distance_impl
+    procedure, public, nopass :: Get_stiffness => Get_stiffness_impl
+    procedure, public, nopass :: Update_voidr => Update_voidr_impl
+  endtype Elast
   !======================================================================
-  ! 抽象接口定义（在子模块中实现）
+  ! Abstract interface definition (implemented in the sub-module)
   !======================================================================
   interface
-    module function isyield_impl(stress, harden) result(distance)
-      use Base_config, only: data_t, dp
-      implicit none
-      real(data_t), intent(in), dimension(3, 3) :: stress
-      real(data_t), intent(in) :: harden
-      real(dp) :: distance
-    endfunction isyield_impl
+    module function Yield_distance_impl(stress, harden) result(distance)
+      real(DP), intent(in), dimension(3, 3) :: stress
+      real(DP), intent(in) :: harden
+      real(DP) :: distance
+    endfunction Yield_distance_impl
     !*****************************************************************************
-    !> @brief interpolate_impl
+    !> @brief Get_gtheta_impl
     !>
     !> @details 函数详细描述
     !>
@@ -47,12 +46,24 @@ module elastic_mod
     !>
     !> @return 返回值说明
     !*****************************************************************************
-    module function interpolate_impl(stress) result(gtheta)
-      use Base_config, only: data_t
-      implicit none
-      real(data_t), dimension(3, 3), intent(in) :: stress
-      real(data_t) :: gtheta
-    endfunction interpolate_impl
+    module subroutine Get_gtheta_impl(stress, gtheta, atheta, sdgth)
+      real(DP), dimension(3, 3), intent(in) :: stress
+      real(DP) :: gtheta, atheta, sdgth
+    endsubroutine Get_gtheta_impl
+    !*****************************************************************************
+    !> @brief Get_pfratio_impl
+    !>
+    !> @details 函数详细描述
+    !>
+    !> @param[in]  参数名 输入参数说明
+    !> @param[out] 参数名 输出参数说明
+    !>
+    !> @return 返回值说明
+    !*****************************************************************************
+    module function Get_pfratio_impl(stress) result(pfratio)
+      real(DP),dimension(3,3),intent(in) :: stress
+      real(DP),dimension(3,3) :: pfratio
+    end function Get_pfratio_impl
     !*****************************************************************************
     !> @brief get_stiffness_impl
     !>
@@ -64,13 +75,11 @@ module elastic_mod
     !>
     !> @return 返回值说明
     !*****************************************************************************
-    module function get_stiffness_impl(stress, void_ratio) result(stiffness)
-      use Base_config, only: data_t
-      implicit none
-      real(data_t), dimension(3, 3), intent(in) :: stress
-      real(data_t), intent(in) :: void_ratio
-      real(data_t), dimension(3, 3, 3, 3) :: stiffness
-    endfunction get_stiffness_impl
+    module function Get_stiffness_impl(stress, void_ratio) result(stiffness)
+      real(DP), dimension(3, 3), intent(in) :: stress
+      real(DP), intent(in) :: void_ratio
+      real(DP), dimension(3, 3, 3, 3) :: stiffness
+    endfunction Get_stiffness_impl
     !*****************************************************************************
     !> @brief update_voidr_impl
     !>
@@ -82,13 +91,11 @@ module elastic_mod
     !>
     !> @return 返回值说明
     !*****************************************************************************
-    module function update_voidr_impl(voidr, dstrain) result(new_voidr)
-      use Base_config
-      implicit none
-      real(dp),intent(in) :: voidr
-      real(dp),intent(in),dimension(3,3) :: dstrain
-      real(dp):: new_voidr
-    end function update_voidr_impl
+    module function Update_voidr_impl(voidr, dstrain) result(new_voidr)
+      real(dp), intent(in) :: voidr
+      real(dp), intent(in), dimension(3, 3) :: dstrain
+      real(dp) :: new_voidr
+    endfunction Update_voidr_impl
   endinterface ! end interface
 
 contains

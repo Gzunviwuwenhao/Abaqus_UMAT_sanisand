@@ -4,7 +4,9 @@ project(myelastic)
 # library
 add_library(${PROJECT_NAME}
   include/elastic.F90
+  include/plastic.F90
   src/elastic_impl.F90
+  src/plastic_impl.F90
 )
 # Add module directory to include path
 target_include_directories(${PROJECT_NAME}

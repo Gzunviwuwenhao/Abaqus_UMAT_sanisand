@@ -1,8 +1,11 @@
 !*****************************************************************************
 !> @brief material_config
 !>
-!> @details 模块详细描述
-!>
+!> @details 该模块为材料常数模块,包括以下的参数
+!> (1) G0 : shear modulus constant
+!> (2) NU : Possion's ratio
+!> (3) C  : The ratio between the critical state stress ratio in triaxial
+!> extension M_e and that in triaxial compression M_c
 !> @author wuwenhao
 !> @date 2025/10/24
 !*****************************************************************************

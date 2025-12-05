@@ -24,7 +24,7 @@ module Base_config
   real(DP), parameter :: PA = 101.325_DP ! atmospheric pressure, unit kPa
   real(DP), parameter :: PI = 3.1415927_DP ! circular constant
   real(DP), parameter :: EPS = 1.0_DP-12 ! a small number
-  real(DP), parameter :: ZERO = 0.0_DP ! zero value
+  real(DP), parameter :: ZERO = 0.0_DP
   real(DP), parameter :: ONE = 1.0_DP
   real(DP), parameter :: TWO = 2.0_DP
   real(DP), parameter :: THREE = 3.0_DP

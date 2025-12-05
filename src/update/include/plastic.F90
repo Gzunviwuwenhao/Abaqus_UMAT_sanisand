@@ -14,6 +14,7 @@ module plastic_mod
   contains
     procedure, public, nopass :: Get_pfsig => Get_pfsig_impl
     procedure, public, nopass :: Get_voidc => Voidc_impl
+    procedure, public, nopass :: Get_pgsig => Get_pgsig_impl
   endtype plast
   !
   interface
@@ -32,8 +33,25 @@ module plastic_mod
       use Base_config
       implicit none
       real(dp), dimension(3, 3), intent(in) :: sigma
-      real(dp) :: pfsig
+      real(dp), dimension(3, 3) :: pfsig
     endfunction Get_pfsig_impl
+    !*****************************************************************************
+    !> @brief Get_pgsig_impl
+    !>
+    !> @details 函数详细描述
+    !>
+    !> @param[in]  stress :current stress tensor
+    !> @param[out] pfsig :Return a yield function corresponding to the partial
+    !> derivative of stress
+    !>
+    !> @return 返回值说明
+    !*****************************************************************************
+    module function Get_pgsig_impl(sigma, fabric) result(pgsig)
+      use Base_config
+      implicit none
+      real(dp), dimension(3, 3), intent(in) :: sigma, fabric
+      real(dp), dimension(3, 3) :: pgsig
+    endfunction Get_pgsig_impl
     !*****************************************************************************
     !> @brief voidc_impl
     !>
@@ -45,15 +63,15 @@ module plastic_mod
     !>
     !> @return 返回值说明
     !*****************************************************************************
-    module function Voidc_impl(sigma,voidr) result(voidc)
+    module function Voidc_impl(sigma, voidr) result(voidc)
       use Base_config
       implicit none
       ! input
-      real(dp),dimension(3,3),intent(in) :: sigma
-      real(dp),intent(in) :: voidr
+      real(dp), dimension(3, 3), intent(in) :: sigma
+      real(dp), intent(in) :: voidr
       ! output
       real(dp) :: voidc
-    end function Voidc_impl
+    endfunction Voidc_impl
   endinterface ! end interface
 contains
 

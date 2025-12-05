@@ -76,7 +76,7 @@ program test
   enddo
   ! 验证应力比
   R_ref = S(:, :) / p
-  R = opt_%Ratio(stress)
+  R = opt_%Get_ratio(stress)
   do i = 1, 3
     do j = 1, 3
       CHECK_FLOAT_EQUAL(R(i, j), R_ref(i, j), " trace vertify")

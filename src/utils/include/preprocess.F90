@@ -8,14 +8,10 @@
 !> @date 2025/11/17
 !*****************************************************************************
 module presolve_mod
+  use Base_config, only: DP
   implicit none
-  public convert_array_to_tensor, print_array
+  public Convert_array_to_tensor, Convert_tensor_to_array, Print_array
   private
-
-  !
-  interface print_array
-    module procedure print_impl_
-  endinterface
   ! Public interface
   interface
     !**************************************************************************
@@ -24,23 +20,36 @@ module presolve_mod
     !> @details: this function is used to convert stress into a 3×3 two-dimensional tensor
     !>
     !> @param[in]  array: 输入的向量
-    !> @param[in]  size: 向量的大小
     !> @param[out] tensor: 应力张量
     !>
     !> @return 返回值说明
     !**************************************************************************
-    module function convert_array_to_tensor(array, scalar) result(tensor)
-      use Base_config, only: data_t
-      implicit none
-      real(data_t), intent(in) :: array(:)
-      real(data_t), intent(in), optional :: scalar
-      real(data_t), dimension(3, 3) :: tensor
-    endfunction convert_array_to_tensor
+    module function Convert_array_to_tensor(array, scalar) result(tensor)
+      real(DP), intent(in) :: array(:)
+      real(DP), intent(in), optional :: scalar
+      real(DP), dimension(3, 3) :: tensor
+    endfunction Convert_array_to_tensor
+    !**************************************************************************
+    !> @brief convert_stress_to_tensor
+    !>
+    !> @details: this function is used to convert a 3×3 two-dimensional tensor into array
+    !>
+    !> @param[in]  tensor: 输入的向量
+    !> @param[in]  size: 向量的大小
+    !> @param[out] array: 输出数组
+    !>
+    !> @return 返回值说明
+    !**************************************************************************
+    module function Convert_tensor_to_array(tensor, size, scalar) result(array)
+      real(DP), dimension(3, 3), intent(in) :: tensor
+      integer, intent(in) :: size
+      integer, intent(in), optional :: scalar
+      real(DP), dimension(size) :: array
+    endfunction Convert_tensor_to_array
+
     ! print the array
-    module Subroutine print_impl_(array)
-      use Base_config, only: data_t
-      implicit none
-      real(data_t), intent(in), dimension(:) :: array
+    module Subroutine Print_array(array)
+      real(DP), intent(in), dimension(:) :: array
     endSubroutine
     !
   endinterface ! end interface
