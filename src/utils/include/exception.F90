@@ -104,10 +104,10 @@ contains
   !> @date 2025/12/01
   !*****************************************************************************
   subroutine ASSERT_FLOAT_EQUAL(lhs, rhs, msg, file, line)
-    use Base_config, only: data_t, eps
+    use Base_config, only: DP, EPS
     implicit none
     ! Input/Output variables
-    real(data_t), intent(in) :: lhs, rhs
+    real(DP), intent(in) :: lhs, rhs
     character(len=*), intent(in) :: msg, file
     integer, intent(in) :: line
     character(len=:), allocatable :: validator_msg
@@ -118,8 +118,8 @@ contains
     msg_len = 200  ! 足够容纳 "Value X.XXXXXX/=expected X.XXXXXX (tolerance: X.XXXXXX)"
     allocate(character(len=msg_len) :: validator_msg)
     write(validator_msg, '("Value ", G0, "/=expected ", G0," (tolerance: ",G0,")" )') &
-      lhs, rhs, eps
-    if(abs(lhs - rhs) > eps) then
+      lhs, rhs, EPS
+    if(abs(lhs - rhs) > EPS) then
       Error = ErrorContext(file, line, msg)
       call Error%throw_error(validator_msg)
     endif

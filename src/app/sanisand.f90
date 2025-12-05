@@ -66,7 +66,7 @@ subroutine Umat(stress, statev, ddsdde, sse, spd, scd, &
   real(dp) :: ftoltr
   real(data_t) :: pmeini, meanetr
   real(dp), dimension(3, 3, 3, 3) :: stiffness
-  type(torch) :: opt_
+  type(Torch) :: opt_
   type(elast) :: elast_
   !------------------------
   sigma(:, :) = convert_array_to_tensor(stress)
@@ -76,7 +76,7 @@ subroutine Umat(stress, statev, ddsdde, sse, spd, scd, &
   fabric(:, :) = -convert_array_to_tensor(statev(3:8))
   fabric(:, :) = matmul(drot, matmul(fabric, transpose(drot)))
   ! initial mean stress
-  pmeini = opt_%trace(sigma) / three
+  pmeini = opt_%Trace(sigma) / three
   !
   if(pmeini < tensno) then
 
@@ -86,7 +86,7 @@ subroutine Umat(stress, statev, ddsdde, sse, spd, scd, &
     ! calculate the elastic trial stress
     sigetr(:, :) = sigma(:, :) + dsigetr(:, :)
     ftoltr = elast_%isyield(sigetr, harden)
-    meanetr = opt_%trace(sigetr) / 3.0_dp
+    meanetr = opt_%Trace(sigetr) / 3.0_dp
     if(ftoltr <= eps .and. meanetr >= tensno) then
       ! elastic updated
       sig_upd(:, :) = sigetr(:, :)

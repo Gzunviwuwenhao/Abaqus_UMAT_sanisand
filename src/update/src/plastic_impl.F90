@@ -21,8 +21,8 @@ contains
     real(dp),dimension(3,3,3,3) :: prpsigma
     real(dp) :: mean
     integer :: i,j,k,l
-    type(torch) :: torch_
-    mean = torch_%trace(sigma)/3.0_dp
+    type(Torch) :: torch_
+    mean = torch_%Trace(sigma)/3.0_dp
     do l = 1, 3
       do k = 1, 3
         do j = 1, 3

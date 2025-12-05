@@ -11,31 +11,28 @@ module Base_config
   use, intrinsic :: iso_fortran_env, only: real32, real64, int32, int64, int8
   implicit none
   private
-  public :: pa, pi, eps, delta, zero, one, two, three, four
-  public :: dp, sp, I4, I8
-  public :: index_t, char_t, data_t
-  public :: tensno
-  integer, parameter :: dp = real64 ! double precision
-  integer, parameter :: sp = real32 ! single precision
+  public :: PA, PI, EPS, DELTA, ZERO, ONE, TWO, THREE, FOUR
+  public :: DP, SP, I4, I8
+  public :: TENSNO
+  integer, parameter :: DP = real64 ! double precision
+  integer, parameter :: SP = real32 ! single precision
   integer, parameter :: I4 = int32
   integer, parameter :: I8 = int64
-  integer(int8), parameter :: char_t = int8
-  integer(I4), parameter :: index_t = I4
-  integer(I4), parameter :: data_t = dp
-
+  !
+  integer, parameter :: MAX_INDEX = huge(I4)
   ! constants
-  real(dp), parameter :: pa = 101.325d0 ! atmospheric pressure, unit kPa
-  real(dp), parameter :: pi = 3.1415927D0 ! circular constant
-  real(dp), parameter :: eps = 1.0d-12 ! a small number
-  real(dp), parameter :: zero = 0.0_dp ! zero value
-  real(dp), parameter :: one = 1.0_dp
-  real(dp), parameter :: two = 2.0_dp
-  real(dp), parameter :: three = 3.0_dp
-  real(dp), parameter :: four = 4.0_dp
-  real(dp), parameter :: delta(3, 3) = reshape( &
-                         [1.D0, 0.D0, 0.D0, &
-                          0.D0, 1.D0, 0.D0, &
-                          0.D0, 0.D0, 1.D0],[3, 3]) ! Kronecker delta
-  real(dp), parameter :: tensno = 1.0d-2
+  real(DP), parameter :: PA = 101.325_DP ! atmospheric pressure, unit kPa
+  real(DP), parameter :: PI = 3.1415927_DP ! circular constant
+  real(DP), parameter :: EPS = 1.0_DP-12 ! a small number
+  real(DP), parameter :: ZERO = 0.0_DP ! zero value
+  real(DP), parameter :: ONE = 1.0_DP
+  real(DP), parameter :: TWO = 2.0_DP
+  real(DP), parameter :: THREE = 3.0_DP
+  real(DP), parameter :: FOUR = 4.0_DP
+  real(DP), parameter :: DELTA(3, 3) = reshape( &
+                         [1.0_DP, 0.0_DP, 0.0_DP, &
+                          0.0_DP, 1.0_DP, 0.0_DP, &
+                          0.0_DP, 0.0_DP, 1.0_DP],[3, 3]) ! Kronecker delta
+  real(DP), parameter :: TENSNO = 1.0_DP
 contains
 endmodule Base_config ! module base_config

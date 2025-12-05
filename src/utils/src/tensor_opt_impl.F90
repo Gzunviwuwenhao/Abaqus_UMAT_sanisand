@@ -7,10 +7,7 @@
 !> @date 2025/11/27
 !*****************************************************************************
 submodule(tensor_opt_mod) tensor_opt_impl
-  ! 这是tensor_opt 模块的实现子模块
-  ! 可以在实现文件的开头使用 use 语句导入所需模块
-  ! 类似于C++ using namespace, 导入子模块不会污染命名空间，这是安全的
-  use Base_config, only: dp, data_t, index_t, two, three, eps
+  use Base_config, only: DP, TWO, THREE, EPS
   implicit none
 contains
   !*****************************************************************************
@@ -20,7 +17,7 @@ contains
   !>
   !> @param[in] stress 应力张量
   !*****************************************************************************
-  module procedure print_impl_
+  module procedure Print_impl
   implicit none
   integer :: i, j
   ! declaration
@@ -34,8 +31,7 @@ contains
     write(*, '(A)') "]"
   enddo
   write(*, *)
-
-  end procedure print_impl_
+  end procedure Print_impl
   !*****************************************************************************
   !> @brief trace_impl_
   !>
@@ -46,11 +42,11 @@ contains
   !>
   !> @return 矩阵的迹
   !*****************************************************************************
-  module procedure trace_impl_
+  module procedure Trace_impl
   implicit none
-  integer(index_t) :: i
+  integer :: i
   val = sum([(stress(i, i), i=1, 3)])
-  end procedure trace_impl_
+  end procedure Trace_impl
   !*****************************************************************************
   !> @brief sec_invariant_impl_
   !>
@@ -61,37 +57,37 @@ contains
   !>
   !> @return 矩阵的迹
   !*****************************************************************************
-  module procedure sec_dev_invar_impl_
+  module procedure Sec_dev_invar_impl
   implicit none
-  type(torch) :: opt_
-  real(data_t), dimension(3, 3) :: S
-  S = opt_%deviatoric(stress)
+  type(Torch) :: opt_
+  real(DP), dimension(3, 3) :: S
+  S = opt_%Deviatoric(stress)
   val = sum(S**2) / two
-  end procedure sec_dev_invar_impl_
+  end procedure Sec_dev_invar_impl
   !*****************************************************************************
-  module procedure trd_dev_invar_impl_
+  module procedure Trd_dev_invar_impl
   implicit none
-  type(torch) :: opt_
-  real(data_t), dimension(3, 3) :: S, temp
+  type(Torch) :: opt_
+  real(DP), dimension(3, 3) :: S, temp
   ! implementation
   ! deviatoric stress
-  S = opt_%deviatoric(stress)
+  S = opt_%Deviatoric(stress)
   temp = matmul(S, matmul(S, S))
-  val = opt_%trace(temp) / three
-  end procedure trd_dev_invar_impl_
+  val = opt_%Trace(temp) / three
+  end procedure Trd_dev_invar_impl
   !*****************************************************************************
-  module procedure deviatoric_impl_
+  module procedure Deviatoric_impl
   implicit none
   real(dp), parameter :: delta1(3, 3) = reshape( &
                          [1.D0, 0.D0, 0.D0, &
                           0.D0, 1.D0, 0.D0, &
                           0.D0, 0.D0, 1.D0],[3, 3])
-  type(torch) :: opt_
-  real(data_t) :: mean
+  type(Torch) :: opt_
+  real(DP) :: mean
   ! mean is mean stress which must be larger than zero
-  mean = opt_%trace(stress) / three
+  mean = opt_%Trace(stress) / three
   tensor = stress - mean * delta1
-  end procedure deviatoric_impl_
+  end procedure Deviatoric_impl
   !*****************************************************************************
   !> @brief ratio_impl_
   !>
@@ -102,45 +98,45 @@ contains
   !>
   !> @return 矩阵的迹
   !*****************************************************************************
-  module procedure ratio_impl_
+  module procedure Ratio_impl
   ! declaration
   implicit none
-  type(torch) :: opt_
-  real(data_t), dimension(3, 3) :: S
-  real(data_t) :: mean
+  type(Torch) :: opt_
+  real(DP), dimension(3, 3) :: S
+  real(DP) :: mean
   ! implementation
-  mean = opt_%trace(stress) / three
+  mean = opt_%Trace(stress) / three
   IF(ABS(mean) .LT. eps) mean = SIGN(eps, mean)
   ! deviatoric stress
-  S = opt_%deviatoric(stress)
+  S = opt_%Deviatoric(stress)
   ! return tensor
   tensor = S / mean
-  end procedure ratio_impl_
+  end procedure Ratio_impl
   !*****************************************************************************
-  module procedure sin3theta_impl_
+  module procedure Sin3theta_impl
   ! declaration
   implicit none
-  type(torch) :: opt_
-  real(data_t) :: J2, J3
+  type(Torch) :: opt_
+  real(DP) :: J2, J3
   ! implementation
   ! compute J2 and J3
-  J2 = opt_%get_J2(stress)
+  J2 = opt_%Get_J2(stress)
   IF(ABS(J2) .LT. eps) J2 = SIGN(eps, J2)
-  J3 = opt_%get_J3(stress)
+  J3 = opt_%Get_J3(stress)
   IF(ABS(J3) .LT. eps) J3 = SIGN(eps, J3)
   sin3t = -1.5_dp * DSQRT(3.0_dp) * J3 / (J2**1.5_dp)
   if(ABS(sin3t) .GT. 1.0_dp) sin3t = SIGN(1.0_dp, sin3t)
-  end procedure sin3theta_impl_
+  end procedure Sin3theta_impl
   !*****************************************************************************
-  module procedure shear_impl
+  module procedure Shear_impl
   use Base_config, only: three
-  type(torch) :: opt_
-  real(data_t) :: J2
-  J2 = opt_%get_J2(stress)
+  type(Torch) :: opt_
+  real(DP) :: J2
+  J2 = opt_%Get_J2(stress)
   shear = dsqrt(three * J2)
-  end procedure shear_impl
+  end procedure Shear_impl
   !*****************************************************************************
-  module procedure tensor4_ddot_tensor2
+  module procedure Tensor4_ddot_tensor2
   implicit none
   integer :: I, J
   DO J = 1, 3
@@ -148,14 +144,15 @@ contains
       res(I, J) = SUM(TENSOR4(I, J, :, :) * TENSOR2(:, :))
     ENDDO
   ENDDO
-  end procedure tensor4_ddot_tensor2
+  end procedure Tensor4_ddot_tensor2
   !
-  module procedure tensor2_ddot_tensor4
+  module procedure Tensor2_ddot_tensor4
   integer :: I, J
   DO J = 1, 3
     DO I = 1, 3
       res(I, J) = SUM( TENSOR2(:, :)* TENSOR4(:, :, I, J))
     ENDDO
   ENDDO
-  end procedure tensor2_ddot_tensor4
+  end procedure Tensor2_ddot_tensor4
+  !
 endsubmodule tensor_opt_impl

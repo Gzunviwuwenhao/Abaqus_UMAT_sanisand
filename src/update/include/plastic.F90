@@ -12,9 +12,10 @@ module plastic_mod
   private
   type, public :: plast
   contains
-    procedure, public, nopass :: get_pfsig => get_pfsig_impl
-    procedure, public, nopass :: get_voidc => voidc_impl
+    procedure, public, nopass :: Get_pfsig => Get_pfsig_impl
+    procedure, public, nopass :: Get_voidc => Voidc_impl
   endtype plast
+  !
   interface
     !*****************************************************************************
     !> @brief get_pfsig_impl
@@ -27,12 +28,12 @@ module plastic_mod
     !>
     !> @return 返回值说明
     !*****************************************************************************
-    module function get_pfsig_impl(sigma) result(pfsig)
+    module function Get_pfsig_impl(sigma) result(pfsig)
       use Base_config
       implicit none
       real(dp), dimension(3, 3), intent(in) :: sigma
       real(dp) :: pfsig
-    endfunction get_pfsig_impl
+    endfunction Get_pfsig_impl
     !*****************************************************************************
     !> @brief voidc_impl
     !>
@@ -53,7 +54,7 @@ module plastic_mod
       ! output
       real(dp) :: voidc
     end function Voidc_impl
-  endinterface
+  endinterface ! end interface
 contains
 
 endmodule plastic_mod

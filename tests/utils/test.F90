@@ -38,7 +38,7 @@ program test
 #include "macro.h"
   ! declaration variable
   implicit none
-  type(torch) :: opt_
+  type(Torch) :: opt_
   real(data_t), dimension(3, 3) :: stress, S_ref, S, R_ref, R, temp
   real(data_t) :: array1(3), array2(4), array3(6)
   real(data_t), dimension(3, 3) :: tensor1, tensor2, tensor3
@@ -61,14 +61,14 @@ program test
   array2 = -array2 * 100
   array3 = -array3 * 100
   stress = stress * 100
-  call opt_%print(stress)
+  call opt_%Print(stress)
   ! 矩阵的迹
-  mean = opt_%trace(stress)
+  mean = opt_%Trace(stress)
   p = (stress(1, 1) + stress(2, 2) + stress(3, 3)) / 3.0d0
   CHECK_FLOAT_EQUAL(mean / 3.d0, p, " trace vertify")
   ! 验证偏应力
   S_ref = stress - p * delta
-  s = opt_%deviatoric(stress)
+  s = opt_%Deviatoric(stress)
   do i = 1, 3
     do j = 1, 3
       CHECK_FLOAT_EQUAL(S(i, j), S_ref(i, j), " trace vertify")
@@ -76,22 +76,22 @@ program test
   enddo
   ! 验证应力比
   R_ref = S(:, :) / p
-  R = opt_%ratio(stress)
+  R = opt_%Ratio(stress)
   do i = 1, 3
     do j = 1, 3
       CHECK_FLOAT_EQUAL(R(i, j), R_ref(i, j), " trace vertify")
     enddo
   enddo
   ! 验证j2, J3
-  J2 = opt_%get_J2(stress)
+  J2 = opt_%Get_J2(stress)
   J2_ref = sum(s**2) / 2.0d0
   CHECK_FLOAT_EQUAL(J2, J2_ref, " J2 vertify")
   temp = matmul(S, matmul(S, S))
   J3_ref = sum([(temp(i, i), i=1, 3)]) / 3.0d0
-  J3 = opt_%get_J3(stress)
+  J3 = opt_%Get_J3(stress)
   CHECK_FLOAT_EQUAL(J3, J3_ref, " J3 vertify")
   ! sin3t
-  sin3t = opt_%sin3theta(stress)
+  sin3t = opt_%Sin3theta(stress)
   sin3t_ref = -1.5D0 * DSQRT(3.0D0) * J3_ref / (J2_ref**1.5D0)
   CHECK_FLOAT_EQUAL(sin3t, sin3t_ref, " sin3t vertify")
   !
@@ -99,6 +99,6 @@ program test
   tensor2 = convert_array_to_tensor(array2,2.0d0)
   tensor3 = convert_array_to_tensor(array3,2.0d0)
   call print_array(array1)
-  call opt_%print(tensor1)
+  call opt_%Print(tensor1)
 
 endprogram test

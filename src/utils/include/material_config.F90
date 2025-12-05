@@ -7,25 +7,24 @@
 !> @date 2025/10/24
 !*****************************************************************************
 module Material_config
-  use Base_config, only: data_t
+  use Base_config, only: DP
   implicit none
-  public :: param_
+  public :: PARAM
   private
-  ! Module variables
   !---------------------------------------------------------------------------
-  !> @brief param
+  !> @brief param_
   !>
   !> @details 类型详细描述
   !>
   !> @author wuwenhao
   !> @date 2025/11/27
   !---------------------------------------------------------------------------
-  type param
-    real(data_t) :: G0, nu
-    real(data_t) :: c
-  endtype param
-
-  type(param), parameter :: param_ = param(G0=125, nu=0.2, c=0.75)
+  type param_
+    real(DP) :: G0, NU
+    real(DP) :: C
+  endtype param_
+  ! initial type
+  type(param_), parameter :: PARAM = param_(G0=125, NU=0.2, C=0.75)
 contains
 
 endmodule Material_config
