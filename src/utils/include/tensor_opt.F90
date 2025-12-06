@@ -35,6 +35,7 @@ module tensor_opt_mod
     procedure, public, nopass :: Sin3theta => Sin3theta_impl
     procedure, public, nopass :: Shear => Shear_impl
     procedure, public, nopass :: Normalize => normalize_impl
+    procedure, public, nopass :: Norm => Norm_impl
   endtype Torch
   !
   interface operator(.ddot.)
@@ -160,6 +161,19 @@ module tensor_opt_mod
       real(DP), dimension(3, 3), intent(in) :: tensor
       real(DP), dimension(3, 3) :: res
     endfunction Normalize_impl
+    !***************************************************************************
+    !> @brief Normalize_impl
+    !>
+    !> @details Calculate the normalize of the tensor
+    !>
+    !> @param[in]  a 3x3 size of tensor
+    !>
+    !> @return the norm of tensor
+    !***************************************************************************
+    module function Norm_impl(tensor) result(res)
+      real(DP), dimension(3, 3), intent(in) :: tensor
+      real(DP) :: res
+    endfunction Norm_impl
     !***************************************************************************
     !> @brief Tensor4_ddot_tensor2
     !>

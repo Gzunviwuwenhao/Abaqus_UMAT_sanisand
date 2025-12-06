@@ -9,6 +9,7 @@
 !*****************************************************************************
 module elastic_mod
   use Base_config, only: DP
+  use share_vars
   implicit none
   private
   !---------------------------------------------------------------------------
@@ -22,7 +23,8 @@ module elastic_mod
   type, public :: Elast
   contains
     procedure, public, nopass :: Get_gtheta => Get_gtheta_impl
-    procedure, public, nopass :: Get_pfratio => Get_pfratio_impl
+    procedure, public, nopass :: Get_pFpr => Get_pFpr_impl
+    procedure, public, nopass :: Get_anisotropy => Get_anisotropy_impl
     procedure, public, nopass :: Yield_distance => yield_distance_impl
     procedure, public, nopass :: Get_stiffness => Get_stiffness_impl
     procedure, public, nopass :: Update_voidr => Update_voidr_impl
@@ -31,10 +33,9 @@ module elastic_mod
   ! Abstract interface definition (implemented in the sub-module)
   !======================================================================
   interface
-    module function Yield_distance_impl(stress, harden) result(distance)
-      real(DP), intent(in), dimension(3, 3) :: stress
-      real(DP), intent(in) :: harden
-      real(DP) :: distance
+    module function Yield_distance_impl(shvars) result(ftol)
+      type(Share_var) :: shvars
+      real(DP) :: ftol
     endfunction Yield_distance_impl
     !*****************************************************************************
     !> @brief Get_gtheta_impl
@@ -46,10 +47,24 @@ module elastic_mod
     !>
     !> @return 返回值说明
     !*****************************************************************************
-    module subroutine Get_gtheta_impl(stress, gtheta, atheta, sdgth)
-      real(DP), dimension(3, 3), intent(in) :: stress
+    module subroutine Get_gtheta_impl(shvars, gtheta, atheta, sdgth)
+      type(Share_var) :: shvars
       real(DP) :: gtheta, atheta, sdgth
     endsubroutine Get_gtheta_impl
+    !*****************************************************************************
+    !> @brief Get_gtheta_impl
+    !>
+    !> @details 函数详细描述
+    !>
+    !> @param[in]  参数名 输入参数说明
+    !> @param[out] 参数名 输出参数说明
+    !>
+    !> @return 返回值说明
+    !*****************************************************************************
+    module function Get_anisotropy_impl(shvars) result(abase)
+      type(Share_var) :: shvars
+      real(DP) :: abase
+    endfunction Get_anisotropy_impl
     !*****************************************************************************
     !> @brief Get_pfratio_impl
     !>
@@ -60,10 +75,10 @@ module elastic_mod
     !>
     !> @return 返回值说明
     !*****************************************************************************
-    module function Get_pfratio_impl(stress) result(pfratio)
-      real(DP),dimension(3,3),intent(in) :: stress
-      real(DP),dimension(3,3) :: pfratio
-    end function Get_pfratio_impl
+    module function Get_pFpr_impl(shvars) result(pfratio)
+      type(Share_var) :: shvars
+      real(DP), dimension(3, 3) :: pfratio
+    endfunction Get_pFpr_impl
     !*****************************************************************************
     !> @brief get_stiffness_impl
     !>
@@ -75,9 +90,9 @@ module elastic_mod
     !>
     !> @return 返回值说明
     !*****************************************************************************
-    module function Get_stiffness_impl(stress, void_ratio) result(stiffness)
-      real(DP), dimension(3, 3), intent(in) :: stress
-      real(DP), intent(in) :: void_ratio
+    module function Get_stiffness_impl(shvars, voidr) result(stiffness)
+      type(Share_var) :: shvars
+      real(DP), intent(in) :: voidr
       real(DP), dimension(3, 3, 3, 3) :: stiffness
     endfunction Get_stiffness_impl
     !*****************************************************************************

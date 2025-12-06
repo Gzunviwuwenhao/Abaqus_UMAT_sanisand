@@ -25,9 +25,19 @@ module Material_config
   type param_
     real(DP) :: G0, NU
     real(DP) :: C
+    real(DP) :: KH
+    !
+    real(DP) :: VOIDC, KSI, LAC, MCS, EA
+    real(DP) :: D1, DM
+    real(DP) :: CH,NKP
+    real(DP) :: FEVR
   endtype param_
   ! initial type
-  type(param_), parameter :: PARAM = param_(G0=125, NU=0.2, C=0.75)
+  type(param_), parameter :: PARAM = param_(G0=125.0_DP, NU=0.2_DP, C=0.75_DP, &
+                                            KH=0.03_DP, KSI=0.7_DP, LAC=0.05_DP, &
+                                            MCS=1.25_DP, EA=0.1_DP, VOIDC=0.94_DP,&
+                                            D1 = 0.1_DP, DM = 3.5_DP,&
+                                            CH = 0.6_DP,NKP = 1.1_DP,FEVR = 5.7_DP)
 contains
 
 endmodule Material_config

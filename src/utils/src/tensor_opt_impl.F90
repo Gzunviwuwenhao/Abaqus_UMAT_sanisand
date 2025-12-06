@@ -177,6 +177,20 @@ contains
   res(:, :) = tensor(:, :) / norm
   end procedure Normalize_impl
   !***************************************************************************
+  !> @brief Normalize_impl
+  !>
+  !> @details Calculate the normalize of the tensor
+  !>
+  !> @param[in]  a 3x3 size of tensor
+  !>
+  !> @return the norm of tensor
+  !***************************************************************************
+  module procedure Norm_impl
+    real(DP) :: temp
+    temp = sum(tensor**2)
+    res = max(dsqrt(temp),EPS)
+  end procedure Norm_impl
+  !***************************************************************************
   !> @brief Tensor4_ddot_tensor2
   !>
   !> @details Calculate the double dot product of a fourth-order tensor and
