@@ -5,6 +5,7 @@ project(myelastic)
 add_library(${PROJECT_NAME}
   include/elastic.F90
   include/plastic.F90
+  include/share_vars.F90
   src/elastic_impl.F90
   src/plastic_impl.F90
 )

@@ -7,8 +7,8 @@
 !> @date 2025/12/05
 !*******************************************************************************
 module plastic_mod
-  use Base_config
-  use share_vars
+  use Base_config, only: DP
+  use share_vars, only: Share_var
   implicit none
   private
   type, public :: plast
@@ -34,10 +34,9 @@ module plastic_mod
     !>
     !> @return 返回值说明
     !***************************************************************************
-    module function Get_pfsig_impl(shvars) result(pfsig)
-      implicit none
+    module function Get_pfsig_impl(shvars) result(pFsig)
       type(Share_var) :: shvars
-      real(DP), dimension(3, 3) :: pfsig
+      real(DP), dimension(3, 3) :: pFsig
     endfunction Get_pfsig_impl
     !***************************************************************************
     !> @brief Get_pgsig_impl
@@ -69,7 +68,6 @@ module plastic_mod
     !> @return 返回值说明
     !***************************************************************************
     module function Get_psim_impl(shvars, voidr) result(psim)
-      implicit none
       ! input
       type(Share_var) :: shvars
       real(DP), intent(in) :: voidr
@@ -110,10 +108,11 @@ module plastic_mod
       real(DP), intent(in) :: voidr
       real(DP) :: Rh, RF(3, 3)
     endsubroutine Get_evolution_impl
+
   endinterface ! end interface
 contains
   function Get_Dkp_impl(shvars, voidr) result(Dkp)
-      type(Share_var) :: shvars
+    type(Share_var) :: shvars
     real(DP), intent(in) :: voidr
     real(DP) :: Dkp, RH, RF(3, 3)
     type(plast) plast_

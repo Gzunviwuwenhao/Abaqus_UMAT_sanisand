@@ -19,8 +19,9 @@ contains
   module procedure Get_gtheta_impl
   real(DP) :: gtheta1, sin3t
   !
-  sin3t = torch_%Sin3theta(shvars%sigma_(:,:))
-  gtheta1 = (-dsqrt((1.0_DP + PARAM%C**2)**2 + 4.0_dp * PARAM%C * &
+  sin3t = torch_%Sin3theta(shvars%get_sigma())
+  if(abs(sin3t) .lt. EPS) sin3t = sign(EPS, sin3t)
+  gtheta1 = (-dsqrt((1.0_DP + PARAM%C**2)**2 + 4.0_DP * PARAM%C * &
                     (1.0_DP - PARAM%C**2) * sin3t) - (1.0_DP + PARAM%C**2)) / 2.0_DP / &
             (1.0_DP - PARAM%C) / sin3t
   gtheta = -PARAM%C * (1.0_DP + PARAM%C) / (1.0_DP - PARAM%C) / sin3t / gtheta1
@@ -49,9 +50,9 @@ contains
   real(DP), dimension(3, 3) :: ratio
   integer :: i
   call elast_%Get_gtheta(shvars, gtheta, atheta, sdgth)
-  sin3t = torch_%Sin3theta(shvars%sigma_(:,:))
-  ratio = torch_%Get_ratio(shvars%sigma_(:,:))
-  rm = dsqrt(3.0_DP * torch_%Get_J2(shvars%sigma_(:,:)))
+  sin3t = torch_%Sin3theta(shvars%get_sigma())
+  ratio = torch_%Get_ratio(shvars%get_sigma())
+  rm = dsqrt(3.0_DP * torch_%Get_J2(shvars%get_sigma()))
   pfratio(:, :) = 1.5_DP / (rm * gtheta)**2 * &
                   ((rm * gtheta + 3.0_DP * rm * sin3t * atheta) * ratio(:, :) + &
                    9.0_DP * atheta * (sum([(ratio(:, i) * ratio(i, :), i=1, 3)])))
@@ -70,19 +71,19 @@ contains
   real(DP) :: mean, RM, gtheta, atheta, sdgth
   ! implementation
   ! check the input variable
-  mean = torch_%Trace(shvars%sigma_) / 3.0_DP
+  mean = torch_%Trace(shvars%get_sigma()) / 3.0_DP
   IF(ABS(mean) .LT. eps) mean = SIGN(eps, mean)
   !
-  RM = torch_%Shear(shvars%sigma_) / mean
+  RM = torch_%Shear(shvars%get_sigma()) / mean
   call elast_%Get_gtheta(shvars, gtheta, atheta, sdgth)
-  ftol = RM / gtheta - shvars%harden_
+  ftol = RM / gtheta - shvars%get_harden()
   end procedure Yield_distance_impl
   !*****************************************************************************
   !> @brief get_stiffness_impl
   !>
   !> @details 函数详细描述
   !>
-  !> @param[in] shvars%sigma_(:,:) : current shvars%sigma_(:,:) tensor(3x3)
+  !> @param[in] shvars%get_sigma()(:,:) : current shvars%get_sigma()(:,:) tensor(3x3)
   !> @param[in] void_ratio : current void ratio(scalar)
   !> @param[out] stiffness : a stiffness tensor of size 3x3x3x3
   !>
@@ -91,10 +92,10 @@ contains
   module procedure get_stiffness_impl
   real(DP) :: shear, bulk, mean
   integer :: i, j, k, l
-  ! mean effective shvars%sigma_(:,:)
-  mean = torch_%Trace(shvars%sigma_(:,:))
+  ! mean effective shvars%get_sigma()(:,:)
+  mean = torch_%Trace(shvars%get_sigma()) / 3.0_DP
   ! shear modulus
-  shear = PARAM%G0 * (2.973_dp - voidr)**2 / (1.0_DP + voidr) / dsqrt(mean * PA)
+  shear = PARAM%G0 * (2.973_DP - voidr)**2 / (1.0_DP + voidr) * dsqrt(mean * PA)
   ! bulk modulus
   bulk = shear * 2.0_DP * (1.0_DP + PARAM%NU) / 3.0_DP / (1.0_DP - 2.0_DP * PARAM%NU)
   ! stiffness tensor
@@ -142,7 +143,7 @@ contains
   real(DP), dimension(3, 3) :: pFpr, dnorm
   pFpr(:, :) = elast_%Get_pFpr(shvars)
   dnorm(:, :) = torch_%Normalize(torch_%Deviatoric(pFpr(:, :)))
-  abase = sum(dnorm(:, :) * shvars%fabric_(:, :))
+  abase = sum(dnorm(:, :) * shvars%get_fabric())
   abase = max(min(abase, 1.0_DP), -1.0_DP)
   end procedure Get_anisotropy_impl
 endsubmodule elastic_impl

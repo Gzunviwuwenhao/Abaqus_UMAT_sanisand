@@ -1,0 +1,236 @@
+1
+
+   Abaqus 2025                                  Date 10-12ÔÂ-2025   Time 20:06:54
+   For use by Supplied by Team-SolidSQUAD under license from Dassault Systemes or its subsidiary.
+
+
+
+                         The Abaqus Software is a product of:
+
+                           Dassault Systemes Americas Corp.
+                           1301 Atwood Avenue, Suite 101W
+                              Johnston, RI 02919, USA
+ 
+
+
+                   The Abaqus Software is available only under license
+                   from Dassault Systemes or its subsidiary and may be
+                   used or reproduced only in accordance with the terms
+                   of such license.
+ 
+                          On machine DESKTOP-JROCK0A 
+                          you are authorized to run
+                          Abaqus/Standard until 31-Dec-2055
+
+                          Your site id is:  
+
+
+ 
+                    For assistance or any other information you may
+                    obtain contact information for your local office
+                    from the world wide web at:
+
+                      https://www.3ds.com/products-services/simulia/services-support/
+
+ 
+                * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+                *                                                         * 
+                *                   *****************                     * 
+                *                   *  N O T I C E  *                     * 
+                *                   *****************                     * 
+                *                                                         * 
+                *                                                         * 
+                *                       Abaqus 2025                       * 
+                *                                                         * 
+                *       BUILD ID: 2024_09_20-21.00.46 RELr427 198590      * 
+                *                                                         * 
+                *                                                         * 
+                *  Please make sure you are using                         * 
+                *  release Abaqus 2025 manuals                            * 
+                *  plus the notes accompanying this release.              * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
+
+ 
+
+
+
+     PROCESSING PART, INSTANCE, AND ASSEMBLY INFORMATION
+   *******************************************************
+
+
+     END PROCESSING PART, INSTANCE, AND ASSEMBLY INFORMATION
+   ***********************************************************
+
+
+
+
+     OPTIONS BEING PROCESSED
+   ***************************
+
+
+  *Element, type=C3D8
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-INITIAL-STRESS
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-X-BOTTOM
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-X-TOP
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-Y-BOTTOM
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-Z-BOTTOM
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-Z-TOP
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL__SET-Y-TOP_S6
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL__SURFACE-P_S2
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL__SURFACE-P_S3
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL__SURFACE-P_S6
+  *heading
+  *material, name=FABRIC_EVOLUTION_MODEL
+  *density
+  *depvar
+  *usermaterial, constants=1, unsymm
+  *initialconditions, type=SOLUTION, user
+  *initialconditions, type=STRESS, user
+  *solidsection, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, material=FABRI
+  *solidsection, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, material=FABRI
+  *surface, type=ELEMENT, name=ASSEMBLY_INSTANCE_SOIL_SET-Y-TOP
+  *surface, type=ELEMENT, name=ASSEMBLY_INSTANCE_SOIL_SURFACE-P
+  *surface, type=ELEMENT, name=ASSEMBLY_INSTANCE_SOIL_SET-Y-TOP
+  *surface, type=ELEMENT, name=ASSEMBLY_INSTANCE_SOIL_SURFACE-P
+  *initialconditions, type=SOLUTION, user
+  *initialconditions, type=STRESS, user
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *surface, type=ELEMENT, name=ASSEMBLY_INSTANCE_SOIL_SET-Y-TOP
+  *surface, type=ELEMENT, name=ASSEMBLY_INSTANCE_SOIL_SURFACE-P
+  *output, field, frequency=0
+  *output, history, frequency=0
+  *output, field, timeinterval=0.06
+  *output, history, frequency=0
+  *elementoutput, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, directions=YE
+  *initialconditions, type=SOLUTION, user
+  *initialconditions, type=STRESS, user
+  *output, field, frequency=0
+  *output, history, frequency=0
+  *output, field, timeinterval=0.06
+  *output, history, frequency=0
+  *elementoutput, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, directions=YE
+  *initialconditions, type=SOLUTION, user
+  *initialconditions, type=STRESS, user
+  *initialconditions, type=SOLUTION, user
+  *initialconditions, type=STRESS, user
+  *initialconditions, type=SOLUTION, user
+  *initialconditions, type=STRESS, user
+  *output, field, frequency=0
+  *output, history, frequency=0
+  *output, field, timeinterval=0.06
+  *output, history, frequency=0
+  *elementoutput, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, directions=YE
+ 
+      ELEMENT CONSTRUCTION EXECUTED IN PARALLEL USING 14 THREADS
+ 
+      ELEMENT GEOMETRY CALCULATIONS EXECUTED IN PARALLEL USING 14 THREADS
+  *step, name=consolidation, nlgeom=NO, inc=1000
+  *step, name=Shear, nlgeom=YES, inc=10000, unsymm=YES
+  *step, name=consolidation, nlgeom=NO, inc=1000
+  *output, field, frequency=0
+  *output, history, frequency=0
+  *step, name=Shear, nlgeom=YES, inc=10000, unsymm=YES
+  *output, field, timeinterval=0.06
+  *output, history, frequency=0
+  *step, name=consolidation, nlgeom=NO, inc=1000
+  *step, name=Shear, nlgeom=YES, inc=10000, unsymm=YES
+  *step, name=consolidation, nlgeom=NO, inc=1000
+  *static
+  *dsload
+  *output, field, frequency=0
+  *output, history, frequency=0
+  *endstep
+  *step, name=Shear, nlgeom=YES, inc=10000, unsymm=YES
+  *static
+  *boundary
+  *output, field, timeinterval=0.06
+  *nodeoutput, nset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, variable=PRESELEC
+  *elementoutput, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, directions=YE
+  *contactoutput, nset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, variable=PRESE
+  *output, history, frequency=0
+  *endstep
+
+ ***WARNING: THE NLGEOM FLAG WAS NOT ACTIVE IN THE PREVIOUS GENERAL 
+             (NON-PERTURBATION) STEP.  THE ACTIVATION OF NLGEOM IN THE CURRENT 
+             STEP MAY CAUSE CONVERGENCE PROBLEMS IF THE DISPLACEMENTS AT THE 
+             END OF THE PREVIOUS GENERAL STEP ARE NOT SMALL.  DISCONTINUITIES 
+             IN DISPLACEMENT RESPONSE HISTORIES SHOULD ALSO BE EXPECTED.
+
+ ***WARNING: OUTPUT AT EXACT, PREDEFINED TIME POINTS WAS REQUESTED IN THIS 
+             STEP. IN ORDER TO WRITE OUTPUT AT EXACT TIME POINTS SPECIFIED, 
+             Abaqus MIGHT USE TIME INCREMENTS SMALLER THAN THE MINIMUM TIME 
+             INCREMENT ALLOWED IN THE STEP. IN ADDITION, THE NUMBER OF 
+             INCREMENTS REQUIRED TO COMPLETE THE STEP WILL IN GENERAL INCREASE.
+  *boundary
+  *boundary
+  *boundary
+  *step, name=consolidation, nlgeom=NO, inc=1000
+  *static
+  *endstep
+  *step, name=Shear, nlgeom=YES, inc=10000, unsymm=YES
+  *static
+  *boundary
+  *endstep
+
+     - (RAMP) OR (STEP) - INDICATE USE OF DEFAULT AMPLITUDES ASSOCIATED WITH THE STEP
+
+     - (RAMP) OR (STEP) - INDICATE USE OF DEFAULT AMPLITUDES ASSOCIATED WITH THE STEP
+
+
+
+                            P R O B L E M   S I Z E
+
+
+          NUMBER OF ELEMENTS IS                                     1
+          NUMBER OF NODES IS                                        8
+          NUMBER OF NODES DEFINED BY THE USER                       8
+          TOTAL NUMBER OF VARIABLES IN THE MODEL                   24
+          (DEGREES OF FREEDOM PLUS MAX NO. OF ANY LAGRANGE MULTIPLIER
+           VARIABLES. INCLUDE *PRINT,SOLVE=YES TO GET THE ACTUAL NUMBER.)
+
+
+
+                              END OF USER INPUT PROCESSING
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =      0.0    
+       SYSTEM TIME (SEC)    =      0.0    
+       TOTAL CPU TIME (SEC) =      0.0    
+       WALLCLOCK TIME (SEC) =            0
+1
+
+   Abaqus 2025                                  Date 10-12ÔÂ-2025   Time 20:06:57
+   For use by Supplied by Team-SolidSQUAD under license from Dassault Systemes or its subsidiary.
+
+                                                                                               STEP    1  INCREMENT    1
+                                                                                          TIME COMPLETED IN THIS STEP   0.00    
+
+
+                        S T E P       1     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                1.000E-02
+          AND A TOTAL TIME PERIOD OF                           1.000E-02
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-08
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                1.000E-02
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+
+          UNSYMMETRIC MATRIX STORAGE AND SOLUTION WILL BE USED

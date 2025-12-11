@@ -23,7 +23,7 @@ module Base_config
   ! constants
   real(DP), parameter :: PA = 101.325_DP ! atmospheric pressure, unit kPa
   real(DP), parameter :: PI = 3.1415927_DP ! circular constant
-  real(DP), parameter :: EPS = 1.0_DP-12 ! a small number
+  real(DP), parameter :: EPS = 1.0D-12 ! a small number
   real(DP), parameter :: ZERO = 0.0_DP
   real(DP), parameter :: ONE = 1.0_DP
   real(DP), parameter :: TWO = 2.0_DP
@@ -33,6 +33,7 @@ module Base_config
                          [1.0_DP, 0.0_DP, 0.0_DP, &
                           0.0_DP, 1.0_DP, 0.0_DP, &
                           0.0_DP, 0.0_DP, 1.0_DP],[3, 3]) ! Kronecker delta
-  real(DP), parameter :: TENSNO = 1.0_DP
+  real(DP), parameter :: TENSNO = 1.0D-2
 contains
+
 endmodule Base_config ! module base_config

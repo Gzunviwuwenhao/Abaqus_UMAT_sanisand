@@ -36,6 +36,7 @@ module tensor_opt_mod
     procedure, public, nopass :: Shear => Shear_impl
     procedure, public, nopass :: Normalize => normalize_impl
     procedure, public, nopass :: Norm => Norm_impl
+    procedure, public, nopass :: eye => eye_impl
   endtype Torch
   !
   interface operator(.ddot.)
@@ -174,6 +175,19 @@ module tensor_opt_mod
       real(DP), dimension(3, 3), intent(in) :: tensor
       real(DP) :: res
     endfunction Norm_impl
+    !***************************************************************************
+    !> @brief eye_impl
+    !>
+    !> @details Calculate the normalize of the tensor
+    !>
+    !> @param[in]  size: size of tensor
+    !>
+    !> @return the unit matrix of given size
+    !***************************************************************************
+    module function eye_impl(size) result(delta)
+      integer, intent(in) :: size
+      real(DP), dimension(size, size) :: delta
+    endfunction eye_impl
     !***************************************************************************
     !> @brief Tensor4_ddot_tensor2
     !>

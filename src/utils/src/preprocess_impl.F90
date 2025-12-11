@@ -8,7 +8,9 @@
 !*****************************************************************************
 submodule(presolve_mod) presolve_impl
   use Base_config, only: DP
+  use tensor_opt_mod
   implicit none
+  type(Torch) :: torch_
 contains
   !**************************************************************************
   !> @brief convert_array_to_tensor
@@ -30,26 +32,26 @@ contains
   endif
   select case(size(array))
   case(3)
-    tensor(1, 1) = -array(1)
-    tensor(2, 2) = -array(2)
-    tensor(1, 2) = -array(3) / scalar_
-    tensor(2, 1) = -array(3) / scalar_
+    tensor(1, 1) = array(1)
+    tensor(2, 2) = array(2)
+    tensor(1, 2) = array(3) / scalar_
+    tensor(2, 1) = array(3) / scalar_
   case(4)
-    tensor(1, 1) = -array(1)
-    tensor(2, 2) = -array(2)
-    tensor(3, 3) = -array(3)
-    tensor(1, 2) = -array(4) / scalar_
-    tensor(2, 1) = -array(4) / scalar_
+    tensor(1, 1) = array(1)
+    tensor(2, 2) = array(2)
+    tensor(3, 3) = array(3)
+    tensor(1, 2) = array(4) / scalar_
+    tensor(2, 1) = array(4) / scalar_
   case(6)
-    tensor(1, 1) = -array(1)
-    tensor(2, 2) = -array(2)
-    tensor(3, 3) = -array(3)
-    tensor(1, 2) = -array(4) / scalar_
-    tensor(2, 1) = -array(4) / scalar_
-    tensor(1, 3) = -array(5) / scalar_
-    tensor(3, 1) = -array(5) / scalar_
-    tensor(2, 3) = -array(6) / scalar_
-    tensor(3, 2) = -array(6) / scalar_
+    tensor(1, 1) = array(1)
+    tensor(2, 2) = array(2)
+    tensor(3, 3) = array(3)
+    tensor(1, 2) = array(4) / scalar_
+    tensor(2, 1) = array(4) / scalar_
+    tensor(1, 3) = array(5) / scalar_
+    tensor(3, 1) = array(5) / scalar_
+    tensor(2, 3) = array(6) / scalar_
+    tensor(3, 2) = array(6) / scalar_
   endselect
   end procedure convert_array_to_tensor
   !**************************************************************************
@@ -72,23 +74,50 @@ contains
   endif
   select case(size)
   case(3)
-    array(1) = -tensor(1, 1)
-    array(2) = -tensor(2, 2)
-    array(3) = -tensor(1, 2) * scalar_
+    array(1) = tensor(1, 1)
+    array(2) = tensor(2, 2)
+    array(3) = tensor(1, 2) * scalar_
   case(4)
-    array(1) = -tensor(1, 1)
-    array(2) = -tensor(2, 2)
-    array(3) = -tensor(3, 3)
-    array(4) = -tensor(1, 2) * scalar_
+    array(1) = tensor(1, 1)
+    array(2) = tensor(2, 2)
+    array(3) = tensor(3, 3)
+    array(4) = tensor(1, 2) * scalar_
   case(6)
-    array(1) = -tensor(1, 1)
-    array(2) = -tensor(2, 2)
-    array(3) = -tensor(3, 3)
-    array(4) = -tensor(1, 2) * scalar_
-    array(5) = -tensor(1, 3) * scalar_
-    array(6) = -tensor(2, 3) * scalar_
+    array(1) = tensor(1, 1)
+    array(2) = tensor(2, 2)
+    array(3) = tensor(3, 3)
+    array(4) = tensor(1, 2) * scalar_
+    array(5) = tensor(1, 3) * scalar_
+    array(6) = tensor(2, 3) * scalar_
   endselect
   end procedure Convert_tensor_to_array
+  !**************************************************************************
+  module procedure Get_rotation_matrix
+  real(DP), dimension(3) :: uaxis
+  real(DP) :: cos, sin, temp, ux, uy, uz
+  !
+  if(axis(1) == 0.0_DP .and. axis(2) == 0.0_DP .and. axis(3) == 0.0_DP) then
+    write(6, *) "Error: Rotation axis cannot be zero vector."
+    call exit(1)
+  endif
+  uaxis = axis / dsqrt(sum(axis**2))
+  ux = uaxis(1)
+  uy = uaxis(2)
+  uz = uaxis(3)
+  cos = dcos(angle)
+  sin = dsin(angle)
+  temp = 1.0_DP - cos
+  rot_matrix(1, 1) = cos + ux * ux * temp
+  rot_matrix(1, 2) = ux * uy * temp - uz * sin
+  rot_matrix(1, 3) = ux * uz * temp + uy * sin
+  rot_matrix(2, 1) = uy * ux * temp + uz * sin
+  rot_matrix(2, 2) = cos + uy * uy * temp
+  rot_matrix(2, 3) = uy * uz * temp - ux * sin
+  rot_matrix(3, 1) = uz * ux * temp - uy * sin
+  rot_matrix(3, 2) = uz * uy * temp + ux * sin
+  rot_matrix(3, 3) = cos + uz * uz * temp
+  end procedure Get_rotation_matrix
+  !**************************************************************************
   ! print array
   module procedure print_array
   implicit none
@@ -101,4 +130,16 @@ contains
     print *, "  array(", i, ") = ", array(i)
   enddo
   end procedure print_array
+  ! abaqus_debug
+  module procedure abaqus_debug
+  logical :: firstrun = .true.
+  integer :: tempvar
+  if((noel_num == noel) .and. (npt_num == npt) .and. num >= iteration) then
+    write(*, *) "debug in ", trim(names)
+    if(firstrun) then
+      write(*, *) "please input an integer"
+      read(*, *) tempvar
+    endif
+  endif
+  end procedure abaqus_debug
 endsubmodule

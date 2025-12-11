@@ -22,16 +22,16 @@ contains
   module procedure get_pfsig_impl
   real(DP), dimension(3, 3, 3, 3) :: prpsigma
   real(DP) :: mean
-  real(DP), dimension(3, 3) :: pfratio
+  real(DP), dimension(3, 3) :: pfratio,sigma
   integer :: i, j, k, l
-
-  mean = torch_%Trace(shvars%sigma_(:,:)) / 3.0_dp
+  sigma = shvars%get_sigma()
+  mean = torch_%Trace(shvars%get_sigma()) / 3.0_dp
   do l = 1, 3
     do k = 1, 3
       do j = 1, 3
         do i = 1, 3
           prpsigma(i, j, k, l) = DELTA(i, k) * DELTA(j, l) / mean - &
-                                 shvars%sigma_(i, j) * DELTA(k, l) / mean**2 / 3.0_dp
+                                 sigma(i,j) * DELTA(k, l) / mean**2 / 3.0_dp
         enddo
       enddo
     enddo
@@ -61,10 +61,10 @@ contains
 
   integer :: i, j, k, l, ip, iq
   !
-  sin3t = torch_%Sin3theta(shvars%sigma_)
+  sin3t = torch_%Sin3theta(shvars%get_sigma())
   call elast_%Get_gtheta(shvars, gtheta, atheta, sdgth)
-  rm = dsqrt(3.0_DP * torch_%Get_J2(shvars%sigma_))
-  R(:, :) = torch_%Get_ratio(shvars%sigma_)
+  rm = dsqrt(3.0_DP * torch_%Get_J2(shvars%get_sigma()))
+  R(:, :) = torch_%Get_ratio(shvars%get_sigma())
   pfratio(:, :) = elast_%Get_pFpr(shvars)
   !
   scalar(1) = 3.0_DP / 4.0_DP / rm / gtheta * (1.0_DP + 3.0_DP * sin3t / gtheta * atheta)
@@ -94,7 +94,7 @@ contains
   dnorm(:, :) = torch_%Normalize(torch_%Deviatoric(pfratio))
   abase = elast_%Get_anisotropy(shvars)
   A = -PARAM%KH * (abase - 1)**2
-  pApr(:, :) = ((shvars%fabric_(:, :) - abase * dnorm(:, :)) / frmag) .ddot.pnpr(:, :, :, :)
+  pApr(:, :) = ((shvars%get_fabric() - abase * dnorm(:, :)) / frmag) .ddot.pnpr(:, :, :, :)
   hardg = rm / gtheta / exp(A)
   pGpA = 2.0_DP * PARAM%KH * hardg * (abase - 1.0_DP) * exp(A)
   pgpr = pfratio(:, :) + pGpA * pApr(:, :)
@@ -118,7 +118,7 @@ contains
   !*****************************************************************************
   module procedure Get_psim_impl
   real(DP) :: e_c, mean, psi, abase
-  mean = torch_%Trace(shvars%sigma_) / 3.0_DP
+  mean = torch_%Trace(shvars%get_sigma()) / 3.0_DP
   abase = elast_%Get_anisotropy(shvars)
   e_c = PARAM%VOIDC - PARAM%LAC * (mean / PA)**PARAM%KSI
   psi = voidr - e_c
@@ -139,7 +139,7 @@ contains
   module procedure Get_dilatancy_impl
   real(DP) :: psim, M_d, gtheta, atheta, sdgth, Rm
   !
-  Rm = dsqrt(3.0_DP * torch_%Get_J2(shvars%sigma_))
+  Rm = dsqrt(3.0_DP * torch_%Get_J2(shvars%get_sigma()))
   call elast_%Get_gtheta(shvars, gtheta, atheta, sdgth)
   psim = plast_%Get_psim(shvars, voidr)
   M_d = PARAM%MCS * gtheta * exp(PARAM%DM * psim)
@@ -165,16 +165,16 @@ contains
   frmag = torch_%Norm(pfratio)
   dnorm = torch_%Normalize(torch_%Deviatoric(pfratio))
   ! mean effective stress
-  mean = torch_%Trace(shvars%sigma_)
+  mean = torch_%Trace(shvars%get_sigma())
   ! shear modulus
   shear = PARAM%G0 * (2.973_dp - voidr)**2 / (1.0_DP + voidr) / dsqrt(mean * PA)
   ! an
   abase = elast_%Get_anisotropy(shvars)
-  Rm = dsqrt(3.0_DP * torch_%Get_J2(shvars%sigma_))
+  Rm = dsqrt(3.0_DP * torch_%Get_J2(shvars%get_sigma()))
   call elast_%Get_gtheta(shvars, gtheta, atheta, sdgth)
   psim = plast_%Get_psim(shvars, voidr)
   M_p = PARAM%MCS * gtheta * exp(-PARAM%NKP * psim)
   Rh = frmag * shear * (1.0_DP - PARAM%CH * voidr) / Rm * (M_p - Rm)
-  RF(:,:) = PARAM%FEVR*exp(abase)*(dnorm(:,:) - shvars%fabric_(:,:))
+  RF(:,:) = PARAM%FEVR*exp(abase)*(dnorm(:,:) - shvars%get_fabric())
   end procedure Get_evolution_impl
 endsubmodule plastic_impl

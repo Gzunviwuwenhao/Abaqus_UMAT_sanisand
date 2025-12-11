@@ -139,6 +139,7 @@ contains
   ! implementation
   ! compute J2 and J3
   J2 = torch_%Get_J2(stress)
+  print *, "EPS=", EPS
   IF(ABS(J2) .LT. eps) J2 = SIGN(eps, J2)
   J3 = torch_%Get_J3(stress)
   IF(ABS(J3) .LT. eps) J3 = SIGN(eps, J3)
@@ -186,10 +187,32 @@ contains
   !> @return the norm of tensor
   !***************************************************************************
   module procedure Norm_impl
-    real(DP) :: temp
-    temp = sum(tensor**2)
-    res = max(dsqrt(temp),EPS)
+  real(DP) :: temp
+  temp = sum(tensor**2)
+  res = max(dsqrt(temp), EPS)
   end procedure Norm_impl
+  !***************************************************************************
+  !> @brief eye_impl
+  !>
+  !> @details Calculate the normalize of the tensor
+  !>
+  !> @param[in]  size: size of tensor
+  !>
+  !> @return the unit matrix of given size
+  !***************************************************************************
+  module procedure eye_impl
+  integer :: i, j
+
+  do i = 1, size
+    do j = 1, size
+      if(i == j) then
+        delta(i, j) = 1.0_DP
+      else
+        delta(i, j) = 0.0_DP
+      endif
+    enddo
+  enddo
+  end procedure eye_impl
   !***************************************************************************
   !> @brief Tensor4_ddot_tensor2
   !>

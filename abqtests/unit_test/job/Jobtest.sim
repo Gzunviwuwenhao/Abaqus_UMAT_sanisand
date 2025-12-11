@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- COPYRIGHT DASSAULT SYSTEMES 2009 -->
+<manifest>
+    <focusFile fileBinary="Jobtest.simdir\Jobtest.1.SMAFocus"/>
+    <publishIndex value="1"/>
+    <bulkFile bulkid="1" fileBinary="Jobtest.1.SMABulk"/>
+</manifest>

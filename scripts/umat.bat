@@ -12,7 +12,7 @@ set "VSCMD_ARG_HOST_ARCH=x64"
 set "VSCMD_ARG_TGT_ARCH=x64"
 set "Platform=x64"
 rem --- 3) 把项目 include/lib 路径放到环境变量前面，确保编译器能找到你的头与兼容的 VC/SDK 头 ---
-set "PROJECT_SOURCE_DIR=F:\vscode\sanisand_for"
+set "PROJECT_SOURCE_DIR=F:\vscode\Abaqus_UMAT_sanisand"
 set "PROJECT_INCLUDE=%PROJECT_SOURCE_DIR%\build-vs2022\include\Release"
 rem --- detect latest Windows Kits 10 include version and set include/lib paths ---
 set "WINDOWS_VC_INCLUDE=C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include"
@@ -97,23 +97,23 @@ echo.
 echo ================================================
 echo 合并源文件
 echo ================================================
-call "F:\vscode\sanisand_for\scripts\merge_fortran.bat"
+call "F:\vscode\Abaqus_UMAT_sanisand\scripts\merge_fortran.bat"
 
 rem --- 5) 删除旧的编译文件 ---
 echo.
 echo ================================================
 echo 清理旧的编译文件
 echo ================================================
-if exist "F:\vscode\sanisand_for\source-std.obj" (
+if exist "F:\vscode\Abaqus_UMAT_sanisand\source-std.obj" (
     echo 删除 source-std.obj...
-    del "F:\vscode\sanisand_for\source-std.obj"
+    del "F:\vscode\Abaqus_UMAT_sanisand\source-std.obj"
 ) else (
     echo source-std.obj 不存在，无需删除
 )
 
-if exist "F:\vscode\sanisand_for\standardU.dll" (
+if exist "F:\vscode\Abaqus_UMAT_sanisand\standardU.dll" (
     echo 删除 standardU.dll...
-    del "F:\vscode\sanisand_for\standardU.dll"
+    del "F:\vscode\Abaqus_UMAT_sanisand\standardU.dll"
 ) else (
     echo standardU.dll 不存在，无需删除
 )

@@ -1,0 +1,115 @@
+# -*- coding: mbcs -*-
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].ConstrainedSketch(name='sketch_soil', sheetSize=1.0)
+mdb.models['Model-1'].sketches['sketch_soil'].rectangle(point1=(0.0, 0.0), 
+    point2=(1.0, 1.0))
+mdb.models['Model-1'].Part(dimensionality=THREE_D, name='soil', type=
+    DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['soil'].BaseSolidExtrude(depth=1.0, sketch=
+    mdb.models['Model-1'].sketches['sketch_soil'])
+mdb.models['Model-1'].parts['soil'].Set(cells=
+    mdb.models['Model-1'].parts['soil'].cells.getSequenceFromMask(mask=(
+    '[#1 ]', ), ), name='set-all')
+mdb.models['Model-1'].parts['soil'].Set(cells=
+    mdb.models['Model-1'].parts['soil'].cells.getSequenceFromMask(mask=(
+    '[#1 ]', ), ), name='set-initial-stress')
+mdb.models['Model-1'].parts['soil'].Set(faces=
+    mdb.models['Model-1'].parts['soil'].faces.getSequenceFromMask(mask=(
+    '[#1 ]', ), ), name='set-X-bottom')
+mdb.models['Model-1'].parts['soil'].Set(faces=
+    mdb.models['Model-1'].parts['soil'].faces.getSequenceFromMask(mask=(
+    '[#8 ]', ), ), name='set-Y-bottom')
+mdb.models['Model-1'].parts['soil'].Set(faces=
+    mdb.models['Model-1'].parts['soil'].faces.getSequenceFromMask(mask=(
+    '[#20 ]', ), ), name='set-Z-bottom')
+mdb.models['Model-1'].parts['soil'].Set(faces=
+    mdb.models['Model-1'].parts['soil'].faces.getSequenceFromMask(mask=(
+    '[#4 ]', ), ), name='set-X-top')
+mdb.models['Model-1'].parts['soil'].Surface(name='set-Y-top', side1Faces=
+    mdb.models['Model-1'].parts['soil'].faces.getSequenceFromMask(mask=(
+    '[#2 ]', ), ))
+mdb.models['Model-1'].parts['soil'].Set(faces=
+    mdb.models['Model-1'].parts['soil'].faces.getSequenceFromMask(mask=(
+    '[#10 ]', ), ), name='set-Z-top')
+mdb.models['Model-1'].parts['soil'].Surface(name='Surface-P', side1Faces=
+    mdb.models['Model-1'].parts['soil'].faces.getSequenceFromMask(mask=(
+    '[#16 ]', ), ))
+mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='instance_soil', 
+    part=mdb.models['Model-1'].parts['soil'])
+mdb.models['Model-1'].parts['soil'].setElementType(elemTypes=(ElemType(
+    elemCode=C3D8, elemLibrary=STANDARD), ElemType(elemCode=C3D6, 
+    elemLibrary=STANDARD), ElemType(elemCode=C3D4, elemLibrary=STANDARD)), 
+    regions=(mdb.models['Model-1'].parts['soil'].cells, ))
+mdb.models['Model-1'].parts['soil'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=1.0)
+mdb.models['Model-1'].parts['soil'].generateMesh()
+mdb.models['Model-1'].Material(name='fabric_evolution_model')
+mdb.models['Model-1'].materials['fabric_evolution_model'].Depvar(n=35)
+mdb.models['Model-1'].materials['fabric_evolution_model'].Density(table=((2.0, 
+    ), ))
+mdb.models['Model-1'].materials['fabric_evolution_model'].UserMaterial(
+    mechanicalConstants=(0.15, ), unsymm=ON)
+mdb.models['Model-1'].HomogeneousSolidSection(material='fabric_evolution_model'
+    , name='section', thickness=None)
+mdb.models['Model-1'].parts['soil'].SectionAssignment(offset=0.0, offsetField=
+    '', offsetType=MIDDLE_SURFACE, region=
+    mdb.models['Model-1'].parts['soil'].sets['set-all'], sectionName='section', 
+    thicknessAssignment=FROM_SECTION)
+mdb.models['Model-1'].StaticStep(description='', initialInc=0.01, maxInc=0.01, 
+    maxNumInc=1000, minInc=1e-08, name='consolidation', previous='Initial', 
+    timeIncrementationMethod=AUTOMATIC, timePeriod=0.01)
+mdb.models['Model-1'].StaticStep(description='', initialInc=1e-06, 
+    matrixSolver=DIRECT, matrixStorage=UNSYMMETRIC, maxInc=0.06, maxNumInc=
+    10000, minInc=1e-08, name='Shear', nlgeom=ON, previous='consolidation', 
+    timeIncrementationMethod=AUTOMATIC, timePeriod=12.0)
+mdb.models['Model-1'].FieldOutputRequest('F-Output-1', createStepName='Shear', 
+    region=
+    mdb.models['Model-1'].rootAssembly.allInstances['instance_soil'].sets['set-all']
+    , timeInterval=0.06, variables=('S', 'PE', 'PEEQ', 'PEMAG', 'LE', 'U', 
+    'RF', 'CF', 'CSTRESS', 'CDISP', 'SDV'))
+mdb.models['Model-1'].historyOutputRequests['H-Output-1'].suppress()
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Initial', 
+    distributionType=UNIFORM, fieldName='', localCsys=None, name='BC_X_bottom', 
+    region=
+    mdb.models['Model-1'].rootAssembly.instances['instance_soil'].sets['set-X-bottom']
+    , u1=SET, u2=UNSET, u3=UNSET, ur1=UNSET, ur2=UNSET, ur3=UNSET)
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Initial', 
+    distributionType=UNIFORM, fieldName='', localCsys=None, name='BC_Y_bottom', 
+    region=
+    mdb.models['Model-1'].rootAssembly.instances['instance_soil'].sets['set-Y-bottom']
+    , u1=UNSET, u2=SET, u3=UNSET, ur1=UNSET, ur2=UNSET, ur3=UNSET)
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Initial', 
+    distributionType=UNIFORM, fieldName='', localCsys=None, name='BC_Z_bottom', 
+    region=
+    mdb.models['Model-1'].rootAssembly.instances['instance_soil'].sets['set-Z-bottom']
+    , u1=UNSET, u2=UNSET, u3=SET, ur1=UNSET, ur2=UNSET, ur3=UNSET)
+mdb.models['Model-1'].Pressure(amplitude=UNSET, createStepName='consolidation', 
+    distributionType=UNIFORM, field='', magnitude=100, name=
+    'Confining pressure', region=
+    mdb.models['Model-1'].rootAssembly.instances['instance_soil'].surfaces['Surface-P'])
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Shear', 
+    distributionType=UNIFORM, fieldName='', localCsys=None, name='load-X', 
+    region=
+    mdb.models['Model-1'].rootAssembly.instances['instance_soil'].sets['set-X-top']
+    , u1=-0.12, u2=UNSET, u3=UNSET, ur1=UNSET, ur2=UNSET, ur3=UNSET)
+mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
+    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
+    memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, 
+    multiprocessingMode=DEFAULT, name='drained_P100_b0_Dr60', 
+    nodalOutputPrecision=SINGLE, numCpus=14, numDomains=14, numGPUs=0, 
+    numThreadsPerMpiProcess=1, queue=None, resultsFormat=ODB, scratch='', type=
+    ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
+# Save by wwh on 2025_12_09-19.40.19; build 2025 2024_09_20-21.00.46 RELr427 198590

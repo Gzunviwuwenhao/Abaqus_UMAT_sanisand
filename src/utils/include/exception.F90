@@ -10,7 +10,7 @@
 module exception_mod
   implicit none
   private
-  public :: ASSERT_TRUE, ASSERT_EQUAL,ASSERT_FLOAT_EQUAL
+  public :: ASSERT_TRUE, ASSERT_EQUAL, ASSERT_FLOAT_EQUAL
   type ErrorContext
     character(len=:), allocatable :: file_
     integer :: line_
@@ -39,37 +39,19 @@ module exception_mod
       class(ErrorContext), intent(in) :: this
     endsubroutine throw_error_impl
     !
+    module subroutine ASSERT_TRUE(expr, msg, file, line)
+      logical, intent(in) :: expr
+      character(len=*), intent(in) :: msg
+      character(len=*), intent(in) :: file
+      character(len=:), allocatable :: validator_msg
+      integer, intent(in) :: line
+    endsubroutine ASSERT_TRUE
   endinterface ! end interface
 contains
 
-  !*****************************************************************************
-  !> @brief ASSERT_TRUE
-  !>
-  !> @details 子程序详细描述
-  !>
-  !> @param[in]  参数名 输入参数说明
-  !> @param[out] 参数名 输出参数说明
-  !> @param[in,out] 参数名 输入输出参数说明
-  !>
-  !> @author wuwenhao
-  !> @date 2025/11/27
-  !*****************************************************************************
-  subroutine ASSERT_TRUE(expr, msg, file, line)
-    implicit none
-    ! Input/Output variables
-    logical, intent(in) :: expr
-    character(len=*), intent(in) :: msg
-    character(len=*), intent(in) :: file
-    character(len=:), allocatable :: validator_msg
-    integer, intent(in) :: line
-    type(ErrorContext) Error
-    !
-    validator_msg = "Condition evaluated to false"
-    if(.not. expr) then
-      Error = ErrorContext(file, line, msg)
-      call Error%throw_error(validator_msg)
-    endif
-  endsubroutine ASSERT_TRUE
+
+
+  !
   ! void ASSERT_EQUAL(int lhs, int rhs, std::string msg, std::string file, int line)
   subroutine ASSERT_EQUAL(lhs, rhs, msg, file, line)
     implicit none
