@@ -12,7 +12,7 @@
 !  You should have received a copy of the MIT License
 !  along with this program. If not, see <https://mit-license.org/>.
 !
-!  @file     sanisand.f90
+!  @file     umat.f90
 !  @brief    简要说明
 !  @details  详细描述
 !
@@ -49,7 +49,8 @@ subroutine Umat(stress, statev, ddsdde, sse, spd, scd, &
   use presolve_mod
   use tensor_opt_mod
   use elastic_mod
-  use share_vars
+  use Container_mod
+  use math_mod
   ! Variable declarations
   implicit none
   !
@@ -63,57 +64,85 @@ subroutine Umat(stress, statev, ddsdde, sse, spd, scd, &
               coords(3), drot(3, 3), dfgrd0(3, 3), dfgrd1(3, 3), &
               sse, spd, scd, rpl, drpldt, dtime, temp, dtemp, &
               predef, dpred, celent, pnewdt
-  real(DP), dimension(3, 3) :: deplsn, fabric
-  real(DP), dimension(3, 3) :: sigma, dsigetr
-  real(DP) :: voidr, voidr_upd, harden
-  real(DP) :: ftol_etr
-  real(DP) :: pmeini, mean_etr
-  real(DP), dimension(3, 3, 3, 3) :: stiffness
   type(Torch) :: torch_
   type(Elast) :: elast_
-  type(Share_var) :: Shvars, Shvars_etr, Shvars_upd
-  LOGICAL :: FIRSTRUN = .true.
-  INTEGER :: TEMPVAR
+  type(Math) :: math_
+  real(DP), dimension(3, 3) :: deplsn, deplsn_ela, res_depsln
+  real(DP), dimension(3, 3) :: dsigma
+  type(Share_var) :: Shvars_ini, Shvars_ela, Shvars_final
+  type(State_var) :: state_ini, stvar_ela, stvar_final
+  real(DP) :: voidr_ini, harden_ini, sigma_ini(3, 3), fabric_ini(3, 3)
+  real(DP) :: mean_etr, mean_final, ftol_etr, alout, rbd
+  real(DP), dimension(3, 3, 3, 3) :: dsigde, dsdeyl, dsdetl
   INTEGER, SAVE :: NUMBER = 0 ! static variable
-  !------------------------
-  call abaqus_debug(1, 1, NUMBER, noel, npt, 0, "Umat")
-  if(noel == 1 .and. npt == 1) NUMBER = NUMBER + 1
-  sigma(:, :) = -convert_array_to_tensor(stress)
-  deplsn(:, :) = -convert_array_to_tensor(dstran, 2.0_DP)
-  voidr = statev(1)
-  harden = statev(2)
-  fabric(:, :) = -convert_array_to_tensor(statev(3:8))
-  fabric(:, :) = matmul(drot, matmul(fabric, transpose(drot)))
-  Shvars = Share_var(harden, sigma, fabric)
-  ! initial mean stress
-  pmeini = torch_%Trace(sigma) / 3.0_DP
+  !-----------------------------------------------------------------------------
+  if(noel == 1 .and. npt == 1) then
+    write(6, *) '=============================================================='
+    write(6, *) 'noel = ', noel, ' npt = ', npt, ' number = ', NUMBER
+    write(6, *) '=============================================================='
+    NUMBER = NUMBER + 1
+  endif
+
+  sigma_ini(:, :) = -convert_array_to_tensor(stress)
+  harden_ini = statev(2)
+  fabric_ini(:, :) = convert_array_to_tensor(statev(3:8))
+  fabric_ini(:, :) = matmul(drot, matmul(fabric_ini, transpose(drot)))
+  ! create Share_var container
+  Shvars_ini = Share_var(harden_ini, sigma_ini, fabric_ini)
   !
+  deplsn(:, :) = -convert_array_to_tensor(dstran, 2.0_DP)
+  voidr_ini = statev(1)
+  state_ini = State_var(voidr_ini, pnewdt)
+  !
+  if(Shvars_ini%is_low()) then
+    ! too low
 
-  if(pmeini < tensno) then
-
-  elseif(pmeini > tensno) then
-    stiffness = elast_%get_stiffness(Shvars, voidr)
-    dsigetr = stiffness.ddot.deplsn
-    ! calculate the elastic trial stress
-    Shvars_etr = Shvars
-    call Shvars_etr%update_sigma(dsigetr)
-    ftol_etr = elast_%Yield_distance(Shvars_etr)
-    mean_etr = torch_%Trace(Shvars_etr%get_sigma()) / 3.0_dp
+  else
+    mean_etr = math_%mean_with_depsln(Shvars_ini, state_ini, deplsn)
+    ftol_etr = math_%ftol_with_depsln(Shvars_ini, state_ini, deplsn)
     if(ftol_etr <= EPS .and. mean_etr >= tensno) then
       ! elastic updated
-      Shvars_upd = Shvars_etr
-      voidr_upd = elast_%Update_voidr(voidr, deplsn)
+      dsigma(:, :) = elast_%calc_dsigma(Shvars_ini, state_ini, deplsn)
+      Shvars_final = Share_var(harden_ini, sigma_ini + dsigma, fabric_ini)
       !
-    elseif(ftol_etr > EPS .or. mean_etr < tensno) then
+      stvar_final = state_ini
+      call stvar_final%update_voidr(deplsn)
       !
+      dsdetl = elast_%Get_stiffness(Shvars_ini, state_ini)
+      !
+    elseif(ftol_etr > EPS .or. (mean_etr < tensno .and. ftol_etr < EPS)) then
+      !     !
+      call abaqus_debug(1, 1, NUMBER, noel, npt, 0, "Umat")
+      call math_%Intchc(Shvars_ini, state_ini, deplsn, rbd, alout)
+      if(rbd < 1.0_DP) then
+      endif
+      ! update variables
+      deplsn_ela(:, :) = alout * deplsn(:, :)
+      res_depsln = (1.0_DP - alout) * deplsn
+      stvar_ela = state_ini
+      call stvar_ela%update_voidr(deplsn_ela)
+      dsigma(:, :) = elast_%calc_dsigma(Shvars_ini, state_ini, deplsn_ela)
+      Shvars_ela = Shvars_ini
+      call Shvars_ela%update_sigma(dsigma)
+      dsigde(:, :, :, :) = elast_%Get_stiffness(Shvars_ini, state_ini)
+      !
+      call math_%Onyield(Shvars_ela, stvar_ela, res_depsln, Shvars_final, stvar_final, dsdeyl)
+      dsdetl = alout * dsigde + (1.0_DP - alout * dsdeyl)
     endif
   endif
+  ! update ddsdde
+  ddsdde = Convert_tensor4_to_tensor2(dsdetl, ntens)
   ! update state variables
-  stress(:) = -Convert_tensor_to_array(Shvars_upd%get_sigma(), ntens)
-  statev(1) = voidr_upd
-  statev(2) = Shvars_upd%get_harden()
-  statev(3:8) = Convert_tensor_to_array(Shvars_upd%get_fabric(), 6)
-  ! storage mean S
-  statev(9) = torch_%Trace(Shvars_upd%get_sigma()) / 3.0_DP
-  ! statev(10) =
+  stress(:) = -Convert_tensor_to_array(Shvars_final%get_sigma(), ntens)
+  statev(1) = stvar_final%get_voidr()
+  statev(2) = Shvars_final%get_harden()
+  statev(3:8) = Convert_tensor_to_array(Shvars_final%get_fabric(), 6)
+  ! storage mean
+  mean_final = torch_%Trace(Shvars_final%get_sigma()) / 3.0_DP
+  statev(9) = mean_final
+  ! statev(10)
+  if(noel == 1 .and. npt == 1) then
+    call Shvars_final%print()
+    write(6, *) "mean = ", mean_final
+  endif
 endsubroutine

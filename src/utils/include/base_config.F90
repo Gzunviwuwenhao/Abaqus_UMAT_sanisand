@@ -13,13 +13,14 @@ module Base_config
   private
   public :: PA, PI, EPS, DELTA, ZERO, ONE, TWO, THREE, FOUR
   public :: DP, SP, I4, I8
-  public :: TENSNO
+  public :: TENSNO, MAX_INDEX, MAX_DATA
   integer, parameter :: DP = real64 ! double precision
   integer, parameter :: SP = real32 ! single precision
   integer, parameter :: I4 = int32
   integer, parameter :: I8 = int64
   !
   integer, parameter :: MAX_INDEX = huge(I4)
+  integer, parameter :: MAX_DATA = huge(DP)
   ! constants
   real(DP), parameter :: PA = 101.325_DP ! atmospheric pressure, unit kPa
   real(DP), parameter :: PI = 3.1415927_DP ! circular constant

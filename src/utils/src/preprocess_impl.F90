@@ -91,7 +91,24 @@ contains
     array(6) = tensor(2, 3) * scalar_
   endselect
   end procedure Convert_tensor_to_array
-  !**************************************************************************
+  !*****************************************************************************
+  module procedure Convert_tensor4_to_tensor2
+  integer, parameter :: FST(6) = [1, 2, 3, 1, 1, 2]
+  integer, parameter :: SCD(6) = [1, 2, 3, 2, 3, 3]
+  integer :: i1, i2, j1, j2, i, j
+  !
+  do j = 1, size
+    j1 = FST(j)
+    j2 = SCD(j)
+    do i = 1, size
+      i1 = FST(i)
+      i2 = SCD(i)
+      tensor2(i, j) = 0.25d0 * (tensor4(i1, i2, j1, j2) + tensor4(i1, i2, j2, j1) + &
+                                tensor4(i2, i1, j1, j2) + tensor4(i2, i1, j2, j1))
+    enddo
+  enddo
+  end procedure Convert_tensor4_to_tensor2
+  !*****************************************************************************
   module procedure Get_rotation_matrix
   real(DP), dimension(3) :: uaxis
   real(DP) :: cos, sin, temp, ux, uy, uz

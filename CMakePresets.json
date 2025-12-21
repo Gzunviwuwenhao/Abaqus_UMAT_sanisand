@@ -57,9 +57,9 @@
       "configuration": "Release"
     },
     {
-      "name": "ninja-debug",
+      "name": "debug",
       "configurePreset": "ninja-debug",
-      "configuration": "debug"
+      "configuration": "Debug"
     }
   ]
 }

@@ -1,21 +1,25 @@
 # project name
-project(myelastic)
+project(myupdate)
 
 # library
 add_library(${PROJECT_NAME}
   include/elastic.F90
   include/plastic.F90
-  include/share_vars.F90
+  include/math.F90
+  include/container.F90
   src/elastic_impl.F90
   src/plastic_impl.F90
+  src/math_impl.F90
+  src/container_impl.F90
 )
+
 # Add module directory to include path
 target_include_directories(${PROJECT_NAME}
-    PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY}
-    myutils
+  PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY}
+  myutils
 )
 
 # Set module output directory explicitly
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}
+  Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}
 )

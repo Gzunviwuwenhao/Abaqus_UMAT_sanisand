@@ -38,9 +38,9 @@
 !  2025/12/08 | 1.0.0.1   | wuwenhao      | Create file
 !*****************************************************************************
 SUBROUTINE Sdvini(statev, coords, nstatv, ncrds, noel, npt, layer, kspt)
-  use Base_config, only: DP, PI
+  use Base_config
   use presolve_mod
-  use Material_config, only: PARAM
+  use Material_config
   use exception_mod
 #include "macro.h"
   IMPLICIT NONE
@@ -55,7 +55,7 @@ SUBROUTINE Sdvini(statev, coords, nstatv, ncrds, noel, npt, layer, kspt)
   CHECK_TRUE(nstatv >= 8, "Sdvini: nstatv is less than 8.")
   ! Initialize state variables
   void_ini = 0.6_DP  ! Initial void ratio
-  harden_ini = 0.0_DP  ! Initial hardening parameter
+  harden_ini = 0.01_DP  ! Initial hardening parameter
   !
   angle = 0.0_DP * PI / 180_DP
   axis = [0.0_DP, 0.0_DP, 1.0_DP]

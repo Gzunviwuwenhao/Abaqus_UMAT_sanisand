@@ -6,11 +6,27 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS -std=c++14)
 
+#
+set(CMAKE_COLOR_DIAGNOSTICS ON)
+
 # 打印所选编译器
 message(STATUS "Fortran compiler: ${CMAKE_Fortran_COMPILER}")
 
 # 定义项目名称和使用的语言
 project(umat_main LANGUAGES Fortran CXX)
+
+# 在配置完成后添加绿色消息
+if(CMAKE_HOST_WIN32)
+  # Windows系统使用PowerShell输出绿色文本
+  execute_process(
+    COMMAND powershell -Command "Write-Host '-- Configuring done (0.0s)' -ForegroundColor Green"
+  )
+else()
+  # Unix-like系统使用echo和ANSI转义码
+  execute_process(
+    COMMAND echo -e "\\033[32m-- Configuring done (0.0s)\\033[0m"
+  )
+endif()
 
 # 根据实际使用的编译器设置选项
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")

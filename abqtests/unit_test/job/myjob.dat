@@ -1,0 +1,705 @@
+1
+
+   Abaqus 2025                                  Date 21-12ÔÂ-2025   Time 10:49:27
+   For use by Supplied by Team-SolidSQUAD under license from Dassault Systemes or its subsidiary.
+
+
+
+                         The Abaqus Software is a product of:
+
+                           Dassault Systemes Americas Corp.
+                           1301 Atwood Avenue, Suite 101W
+                              Johnston, RI 02919, USA
+ 
+
+
+                   The Abaqus Software is available only under license
+                   from Dassault Systemes or its subsidiary and may be
+                   used or reproduced only in accordance with the terms
+                   of such license.
+ 
+                          On machine DESKTOP-36PS5N6 
+                          you are authorized to run
+                          Abaqus/Standard until 31-Dec-2055
+
+                          Your site id is:  
+
+
+ 
+                    For assistance or any other information you may
+                    obtain contact information for your local office
+                    from the world wide web at:
+
+                      https://www.3ds.com/products-services/simulia/services-support/
+
+ 
+                * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+                *                                                         * 
+                *                   *****************                     * 
+                *                   *  N O T I C E  *                     * 
+                *                   *****************                     * 
+                *                                                         * 
+                *                                                         * 
+                *                       Abaqus 2025                       * 
+                *                                                         * 
+                *       BUILD ID: 2024_09_20-21.00.46 RELr427 198590      * 
+                *                                                         * 
+                *                                                         * 
+                *  Please make sure you are using                         * 
+                *  release Abaqus 2025 manuals                            * 
+                *  plus the notes accompanying this release.              * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                *                                                         * 
+                * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+
+
+ 
+
+
+
+     PROCESSING PART, INSTANCE, AND ASSEMBLY INFORMATION
+   *******************************************************
+
+
+     END PROCESSING PART, INSTANCE, AND ASSEMBLY INFORMATION
+   ***********************************************************
+
+
+
+
+     OPTIONS BEING PROCESSED
+   ***************************
+
+
+  *Element, type=C3D8
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-INITIAL-STRESS
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-X-BOTTOM
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-X-TOP
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-Y-BOTTOM
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-Z-BOTTOM
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL_SET-Z-TOP
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL__SET-Y-TOP_S6
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL__SURFACE-P_S2
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL__SURFACE-P_S3
+  *Elset, elset=ASSEMBLY_INSTANCE_SOIL__SURFACE-P_S6
+  *heading
+  *material, name=FABRIC_EVOLUTION_MODEL
+  *density
+  *depvar
+  *usermaterial, constants=1, unsymm
+  *initialconditions, type=SOLUTION, user
+  *initialconditions, type=STRESS, user
+  *solidsection, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, material=FABRI
+  *solidsection, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, material=FABRI
+  *surface, type=ELEMENT, name=ASSEMBLY_INSTANCE_SOIL_SET-Y-TOP
+  *surface, type=ELEMENT, name=ASSEMBLY_INSTANCE_SOIL_SURFACE-P
+  *surface, type=ELEMENT, name=ASSEMBLY_INSTANCE_SOIL_SET-Y-TOP
+  *surface, type=ELEMENT, name=ASSEMBLY_INSTANCE_SOIL_SURFACE-P
+  *initialconditions, type=SOLUTION, user
+  *initialconditions, type=STRESS, user
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *boundary
+  *surface, type=ELEMENT, name=ASSEMBLY_INSTANCE_SOIL_SET-Y-TOP
+  *surface, type=ELEMENT, name=ASSEMBLY_INSTANCE_SOIL_SURFACE-P
+  *output, field, frequency=0
+  *output, history, frequency=0
+  *output, field, timeinterval=0.06
+  *output, history, frequency=0
+  *elementoutput, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, directions=YE
+  *initialconditions, type=SOLUTION, user
+  *initialconditions, type=STRESS, user
+  *output, field, frequency=0
+  *output, history, frequency=0
+  *output, field, timeinterval=0.06
+  *output, history, frequency=0
+  *elementoutput, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, directions=YE
+  *initialconditions, type=SOLUTION, user
+  *initialconditions, type=STRESS, user
+  *initialconditions, type=SOLUTION, user
+  *initialconditions, type=STRESS, user
+  *initialconditions, type=SOLUTION, user
+  *initialconditions, type=STRESS, user
+  *output, field, frequency=0
+  *output, history, frequency=0
+  *output, field, timeinterval=0.06
+  *output, history, frequency=0
+  *elementoutput, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, directions=YE
+  *step, name=consolidation, nlgeom=NO, inc=1000
+  *step, name=Shear, nlgeom=YES, inc=10000, unsymm=YES
+  *step, name=consolidation, nlgeom=NO, inc=1000
+  *output, field, frequency=0
+  *output, history, frequency=0
+  *step, name=Shear, nlgeom=YES, inc=10000, unsymm=YES
+  *output, field, timeinterval=0.06
+  *output, history, frequency=0
+  *step, name=consolidation, nlgeom=NO, inc=1000
+  *step, name=Shear, nlgeom=YES, inc=10000, unsymm=YES
+  *step, name=consolidation, nlgeom=NO, inc=1000
+  *static
+  *dsload
+  *output, field, frequency=0
+  *output, history, frequency=0
+  *endstep
+  *step, name=Shear, nlgeom=YES, inc=10000, unsymm=YES
+  *static
+  *boundary
+  *output, field, timeinterval=0.06
+  *nodeoutput, nset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, variable=PRESELEC
+  *elementoutput, elset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, directions=YE
+  *contactoutput, nset=ASSEMBLY_INSTANCE_SOIL_SET-ALL, variable=PRESE
+  *output, history, frequency=0
+  *endstep
+
+ ***WARNING: THE NLGEOM FLAG WAS NOT ACTIVE IN THE PREVIOUS GENERAL 
+             (NON-PERTURBATION) STEP.  THE ACTIVATION OF NLGEOM IN THE CURRENT 
+             STEP MAY CAUSE CONVERGENCE PROBLEMS IF THE DISPLACEMENTS AT THE 
+             END OF THE PREVIOUS GENERAL STEP ARE NOT SMALL.  DISCONTINUITIES 
+             IN DISPLACEMENT RESPONSE HISTORIES SHOULD ALSO BE EXPECTED.
+
+ ***WARNING: OUTPUT AT EXACT, PREDEFINED TIME POINTS WAS REQUESTED IN THIS 
+             STEP. IN ORDER TO WRITE OUTPUT AT EXACT TIME POINTS SPECIFIED, 
+             Abaqus MIGHT USE TIME INCREMENTS SMALLER THAN THE MINIMUM TIME 
+             INCREMENT ALLOWED IN THE STEP. IN ADDITION, THE NUMBER OF 
+             INCREMENTS REQUIRED TO COMPLETE THE STEP WILL IN GENERAL INCREASE.
+  *boundary
+  *boundary
+  *boundary
+  *step, name=consolidation, nlgeom=NO, inc=1000
+  *static
+  *endstep
+  *step, name=Shear, nlgeom=YES, inc=10000, unsymm=YES
+  *static
+  *boundary
+  *endstep
+
+     - (RAMP) OR (STEP) - INDICATE USE OF DEFAULT AMPLITUDES ASSOCIATED WITH THE STEP
+
+     - (RAMP) OR (STEP) - INDICATE USE OF DEFAULT AMPLITUDES ASSOCIATED WITH THE STEP
+
+
+
+                            P R O B L E M   S I Z E
+
+
+          NUMBER OF ELEMENTS IS                                     1
+          NUMBER OF NODES IS                                        8
+          NUMBER OF NODES DEFINED BY THE USER                       8
+          TOTAL NUMBER OF VARIABLES IN THE MODEL                   24
+          (DEGREES OF FREEDOM PLUS MAX NO. OF ANY LAGRANGE MULTIPLIER
+           VARIABLES. INCLUDE *PRINT,SOLVE=YES TO GET THE ACTUAL NUMBER.)
+
+
+
+                              END OF USER INPUT PROCESSING
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =     0.30    
+       SYSTEM TIME (SEC)    =      0.0    
+       TOTAL CPU TIME (SEC) =     0.30    
+       WALLCLOCK TIME (SEC) =            0
+1
+
+   Abaqus 2025                                  Date 21-12ÔÂ-2025   Time 10:49:39
+   For use by Supplied by Team-SolidSQUAD under license from Dassault Systemes or its subsidiary.
+
+                                                                                               STEP    1  INCREMENT    1
+                                                                                          TIME COMPLETED IN THIS STEP   0.00    
+
+
+                        S T E P       1     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                1.000E-02
+          AND A TOTAL TIME PERIOD OF                           1.000E-02
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-08
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                1.000E-02
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+
+          UNSYMMETRIC MATRIX STORAGE AND SOLUTION WILL BE USED
+ ==============================================================
+ noel =            1  npt =            1  number =            0
+ ==============================================================
+ sigma : 
+Row 1: [100.00,   0.00,   0.00]
+Row 2: [  0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.000000000000     
+ ==============================================================
+ noel =            1  npt =            1  number =            1
+ ==============================================================
+ sigma : 
+Row 1: [100.00,   0.00,   0.00]
+Row 2: [  0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.000000000000     
+  
+                   M E M O R Y   E S T I M A T E
+  
+ PROCESS      FLOATING PT       MINIMUM MEMORY        MEMORY TO
+              OPERATIONS           REQUIRED          MINIMIZE I/O
+             PER ITERATION           (MB)               (MB)
+  
+     1          9.25E+03               17                 24
+  
+ NOTE:
+      (1) SINCE ABAQUS DOES NOT PRE-ALLOCATE MEMORY AND ONLY ALLOCATES MEMORY AS NEEDED DURING THE ANALYSIS,
+          THE MEMORY REQUIREMENT PRINTED HERE CAN ONLY BE VIEWED AS A GENERAL GUIDELINE BASED ON THE BEST
+          KNOWLEDGE AVAILABLE AT THE BEGINNING OF A STEP BEFORE THE SOLUTION PROCESS HAS BEGUN.
+      (2) THE ESTIMATE IS NORMALLY UPDATED AT THE BEGINNING OF EVERY STEP. IT IS THE MAXIMUM VALUE OF THE
+          ESTIMATE FROM THE CURRENT STEP TO THE LAST STEP OF THE ANALYSIS, WITH UNSYMMETRIC SOLUTION TAKEN
+          INTO ACCOUNT IF APPLICABLE. 
+      (3) SINCE THE ESTIMATE IS BASED ON THE ACTIVE DEGREES OF FREEDOM IN THE FIRST ITERATION OF THE 
+          CURRENT STEP, THE MEMORY ESTIMATE MIGHT BE SIGNIFICANTLY DIFFERENT THAN ACTUAL USAGE FOR 
+          PROBLEMS WITH SUBSTANTIAL CHANGES IN ACTIVE DEGREES OF FREEDOM BETWEEN STEPS (OR EVEN WITHIN
+          THE SAME STEP). EXAMPLES ARE: PROBLEMS WITH SIGNIFICANT CONTACT CHANGES, PROBLEMS WITH MODEL
+          CHANGE, PROBLEMS WITH BOTH STATIC STEP AND STEADY STATE DYNAMIC PROCEDURES WHERE ACOUSTIC 
+          ELEMENTS WILL ONLY BE ACTIVATED IN THE STEADY STATE DYNAMIC STEPS.
+      (4) FOR MULTI-PROCESS EXECUTION, THE ESTIMATED VALUE OF FLOATING POINT OPERATIONS FOR EACH PROCESS
+          IS BASED ON AN INITIAL SCHEDULING OF OPERATIONS AND MIGHT NOT REFLECT THE ACTUAL FLOATING 
+          POINT OPERATIONS COMPLETED ON EACH PROCESS. OPERATIONS ARE DYNAMICALLY BALANCED DURING EXECUTION, 
+          SO THE ACTUAL BALANCE OF OPERATIONS BETWEEN PROCESSES IS EXPECTED TO BE BETTER THAN THE ESTIMATE
+          PRINTED HERE.
+      (5) THE UPPER LIMIT OF MEMORY THAT CAN BE ALLOCATED BY ABAQUS WILL IN GENERAL DEPEND ON THE VALUE OF
+          THE "MEMORY" PARAMETER AND THE AMOUNT OF PHYSICAL MEMORY AVAILABLE ON THE MACHINE. PLEASE SEE
+          THE "ABAQUS ANALYSIS USER'S MANUAL" FOR MORE DETAILS. THE ACTUAL USAGE OF MEMORY AND OF DISK
+          SPACE FOR SCRATCH DATA WILL DEPEND ON THIS UPPER LIMIT AS WELL AS THE MEMORY REQUIRED TO MINIMIZE
+          I/O. IF THE MEMORY UPPER LIMIT IS GREATER THAN THE MEMORY REQUIRED TO MINIMIZE I/O, THEN THE ACTUAL
+          MEMORY USAGE WILL BE CLOSE TO THE ESTIMATED "MEMORY TO MINIMIZE I/O" VALUE, AND THE SCRATCH DISK
+          USAGE WILL BE CLOSE-TO-ZERO; OTHERWISE, THE ACTUAL MEMORY USED WILL BE CLOSE TO THE PREVIOUSLY
+          MENTIONED MEMORY LIMIT, AND THE SCRATCH DISK USAGE WILL BE ROUGHLY PROPORTIONAL TO THE DIFFERENCE
+          BETWEEN THE ESTIMATED "MEMORY TO MINIMIZE I/O" AND THE MEMORY UPPER LIMIT. HOWEVER ACCURATE
+          ESTIMATE OF THE SCRATCH DISK SPACE IS NOT POSSIBLE.
+      (6) USING "*RESTART, WRITE" CAN GENERATE A LARGE AMOUNT OF DATA WRITTEN IN THE WORK DIRECTORY.
+ ==============================================================
+ noel =            1  npt =            1  number =            2
+ ==============================================================
+ sigma : 
+Row 1: [100.00,  -0.00,   0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =   100.0000000000000     
+1
+
+   Abaqus 2025                                  Date 21-12ÔÂ-2025   Time 10:49:39
+   For use by Supplied by Team-SolidSQUAD under license from Dassault Systemes or its subsidiary.
+
+                                                                                               STEP    2  INCREMENT    1
+                                                                                          TIME COMPLETED IN THIS STEP   0.00    
+
+
+                        S T E P       2     S T A T I C   A N A L Y S I S
+
+
+                                                                                          
+
+     AUTOMATIC TIME CONTROL WITH -
+          A SUGGESTED INITIAL TIME INCREMENT OF                1.000E-06
+          AND A TOTAL TIME PERIOD OF                            12.0    
+          THE MINIMUM TIME INCREMENT ALLOWED IS                1.000E-08
+          THE MAXIMUM TIME INCREMENT ALLOWED IS                6.000E-02
+
+     LINEAR EQUATION SOLVER TYPE         DIRECT SPARSE
+
+          LARGE DISPLACEMENT THEORY WILL BE USED
+
+          UNSYMMETRIC MATRIX STORAGE AND SOLUTION WILL BE USED
+ ==============================================================
+ noel =            1  npt =            1  number =            3
+ ==============================================================
+ sigma : 
+Row 1: [100.00,  -0.00,   0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =   100.0000000000000     
+  
+                   M E M O R Y   E S T I M A T E
+  
+ PROCESS      FLOATING PT       MINIMUM MEMORY        MEMORY TO
+              OPERATIONS           REQUIRED          MINIMIZE I/O
+             PER ITERATION           (MB)               (MB)
+  
+     1          9.25E+03               17                 24
+  
+ NOTE:
+      (1) SINCE ABAQUS DOES NOT PRE-ALLOCATE MEMORY AND ONLY ALLOCATES MEMORY AS NEEDED DURING THE ANALYSIS,
+          THE MEMORY REQUIREMENT PRINTED HERE CAN ONLY BE VIEWED AS A GENERAL GUIDELINE BASED ON THE BEST
+          KNOWLEDGE AVAILABLE AT THE BEGINNING OF A STEP BEFORE THE SOLUTION PROCESS HAS BEGUN.
+      (2) THE ESTIMATE IS NORMALLY UPDATED AT THE BEGINNING OF EVERY STEP. IT IS THE MAXIMUM VALUE OF THE
+          ESTIMATE FROM THE CURRENT STEP TO THE LAST STEP OF THE ANALYSIS, WITH UNSYMMETRIC SOLUTION TAKEN
+          INTO ACCOUNT IF APPLICABLE. 
+      (3) SINCE THE ESTIMATE IS BASED ON THE ACTIVE DEGREES OF FREEDOM IN THE FIRST ITERATION OF THE 
+          CURRENT STEP, THE MEMORY ESTIMATE MIGHT BE SIGNIFICANTLY DIFFERENT THAN ACTUAL USAGE FOR 
+          PROBLEMS WITH SUBSTANTIAL CHANGES IN ACTIVE DEGREES OF FREEDOM BETWEEN STEPS (OR EVEN WITHIN
+          THE SAME STEP). EXAMPLES ARE: PROBLEMS WITH SIGNIFICANT CONTACT CHANGES, PROBLEMS WITH MODEL
+          CHANGE, PROBLEMS WITH BOTH STATIC STEP AND STEADY STATE DYNAMIC PROCEDURES WHERE ACOUSTIC 
+          ELEMENTS WILL ONLY BE ACTIVATED IN THE STEADY STATE DYNAMIC STEPS.
+      (4) FOR MULTI-PROCESS EXECUTION, THE ESTIMATED VALUE OF FLOATING POINT OPERATIONS FOR EACH PROCESS
+          IS BASED ON AN INITIAL SCHEDULING OF OPERATIONS AND MIGHT NOT REFLECT THE ACTUAL FLOATING 
+          POINT OPERATIONS COMPLETED ON EACH PROCESS. OPERATIONS ARE DYNAMICALLY BALANCED DURING EXECUTION, 
+          SO THE ACTUAL BALANCE OF OPERATIONS BETWEEN PROCESSES IS EXPECTED TO BE BETTER THAN THE ESTIMATE
+          PRINTED HERE.
+      (5) THE UPPER LIMIT OF MEMORY THAT CAN BE ALLOCATED BY ABAQUS WILL IN GENERAL DEPEND ON THE VALUE OF
+          THE "MEMORY" PARAMETER AND THE AMOUNT OF PHYSICAL MEMORY AVAILABLE ON THE MACHINE. PLEASE SEE
+          THE "ABAQUS ANALYSIS USER'S MANUAL" FOR MORE DETAILS. THE ACTUAL USAGE OF MEMORY AND OF DISK
+          SPACE FOR SCRATCH DATA WILL DEPEND ON THIS UPPER LIMIT AS WELL AS THE MEMORY REQUIRED TO MINIMIZE
+          I/O. IF THE MEMORY UPPER LIMIT IS GREATER THAN THE MEMORY REQUIRED TO MINIMIZE I/O, THEN THE ACTUAL
+          MEMORY USAGE WILL BE CLOSE TO THE ESTIMATED "MEMORY TO MINIMIZE I/O" VALUE, AND THE SCRATCH DISK
+          USAGE WILL BE CLOSE-TO-ZERO; OTHERWISE, THE ACTUAL MEMORY USED WILL BE CLOSE TO THE PREVIOUSLY
+          MENTIONED MEMORY LIMIT, AND THE SCRATCH DISK USAGE WILL BE ROUGHLY PROPORTIONAL TO THE DIFFERENCE
+          BETWEEN THE ESTIMATED "MEMORY TO MINIMIZE I/O" AND THE MEMORY UPPER LIMIT. HOWEVER ACCURATE
+          ESTIMATE OF THE SCRATCH DISK SPACE IS NOT POSSIBLE.
+      (6) USING "*RESTART, WRITE" CAN GENERATE A LARGE AMOUNT OF DATA WRITTEN IN THE WORK DIRECTORY.
+ ==============================================================
+ noel =            1  npt =            1  number =            4
+ ==============================================================
+ sigma : 
+Row 1: [100.00,   0.00,   0.00]
+Row 2: [  0.00, 100.00,  -0.00]
+Row 3: [  0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.000353790182     
+ ==============================================================
+ noel =            1  npt =            1  number =            5
+ ==============================================================
+ sigma : 
+Row 1: [100.00,   0.00,   0.00]
+Row 2: [  0.00, 100.00,  -0.00]
+Row 3: [  0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.000707581001     
+ ==============================================================
+ noel =            1  npt =            1  number =            6
+ ==============================================================
+ sigma : 
+Row 1: [100.00,   0.00,   0.00]
+Row 2: [  0.00, 100.00,  -0.00]
+Row 3: [  0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.000708538400     
+ ==============================================================
+ noel =            1  npt =            1  number =            7
+ ==============================================================
+ sigma : 
+Row 1: [100.00,  -0.00,   0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.001240661690     
+ ==============================================================
+ noel =            1  npt =            1  number =            8
+ ==============================================================
+ sigma : 
+Row 1: [100.00,  -0.00,   0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.001239946871     
+ ==============================================================
+ noel =            1  npt =            1  number =            9
+ ==============================================================
+ sigma : 
+Row 1: [100.01,  -0.00,   0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.002037061740     
+ ==============================================================
+ noel =            1  npt =            1  number =           10
+ ==============================================================
+ sigma : 
+Row 1: [100.01,   0.00,   0.00]
+Row 2: [  0.00, 100.00,  -0.00]
+Row 3: [  0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.002037057367     
+ ==============================================================
+ noel =            1  npt =            1  number =           11
+ ==============================================================
+ sigma : 
+Row 1: [100.01,   0.00,   0.00]
+Row 2: [  0.00, 100.00,  -0.00]
+Row 3: [  0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.003232727974     
+ ==============================================================
+ noel =            1  npt =            1  number =           12
+ ==============================================================
+ sigma : 
+Row 1: [100.01,   0.00,   0.00]
+Row 2: [  0.00, 100.00,  -0.00]
+Row 3: [  0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.003232729383     
+ ==============================================================
+ noel =            1  npt =            1  number =           13
+ ==============================================================
+ sigma : 
+Row 1: [100.02,   0.00,   0.00]
+Row 2: [  0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.005026248352     
+ ==============================================================
+ noel =            1  npt =            1  number =           14
+ ==============================================================
+ sigma : 
+Row 1: [100.02,  -0.00,  -0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [ -0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.005026248305     
+ ==============================================================
+ noel =            1  npt =            1  number =           15
+ ==============================================================
+ sigma : 
+Row 1: [100.02,  -0.00,  -0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [ -0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.007716551310     
+ ==============================================================
+ noel =            1  npt =            1  number =           16
+ ==============================================================
+ sigma : 
+Row 1: [100.02,   0.00,  -0.00]
+Row 2: [  0.00, 100.00,  -0.00]
+Row 3: [ -0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.007716551171     
+ ==============================================================
+ noel =            1  npt =            1  number =           17
+ ==============================================================
+ sigma : 
+Row 1: [100.04,   0.00,  -0.00]
+Row 2: [  0.00, 100.00,  -0.00]
+Row 3: [ -0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.011752060871     
+ ==============================================================
+ noel =            1  npt =            1  number =           18
+ ==============================================================
+ sigma : 
+Row 1: [100.04,  -0.00,   0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.011752060565     
+ ==============================================================
+ noel =            1  npt =            1  number =           19
+ ==============================================================
+ sigma : 
+Row 1: [100.05,  -0.00,   0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.017805449308     
+ ==============================================================
+ noel =            1  npt =            1  number =           20
+ ==============================================================
+ sigma : 
+Row 1: [100.05,  -0.00,  -0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [ -0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.017805448619     
+ ==============================================================
+ noel =            1  npt =            1  number =           21
+ ==============================================================
+ sigma : 
+Row 1: [100.08,   0.00,  -0.00]
+Row 2: [  0.00, 100.00,   0.00]
+Row 3: [ -0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.026885811166     
+ ==============================================================
+ noel =            1  npt =            1  number =           22
+ ==============================================================
+ sigma : 
+Row 1: [100.08,   0.00,   0.00]
+Row 2: [  0.00, 100.00,  -0.00]
+Row 3: [  0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.026885809615     
+ ==============================================================
+ noel =            1  npt =            1  number =           23
+ ==============================================================
+ sigma : 
+Row 1: [100.12,   0.00,   0.00]
+Row 2: [  0.00, 100.00,  -0.00]
+Row 3: [  0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.040506982157     
+ ==============================================================
+ noel =            1  npt =            1  number =           24
+ ==============================================================
+ sigma : 
+Row 1: [100.12,   0.00,   0.00]
+Row 2: [  0.00, 100.00,  -0.00]
+Row 3: [  0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.040506978667     
+ ==============================================================
+ noel =            1  npt =            1  number =           25
+ ==============================================================
+ sigma : 
+Row 1: [100.18,   0.00,   0.00]
+Row 2: [  0.00, 100.00,  -0.00]
+Row 3: [  0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.060940152088     
+ ==============================================================
+ noel =            1  npt =            1  number =           26
+ ==============================================================
+ sigma : 
+Row 1: [100.18,   0.00,   0.00]
+Row 2: [  0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.060940144234     
+ ==============================================================
+ noel =            1  npt =            1  number =           27
+ ==============================================================
+ sigma : 
+Row 1: [100.27,  -0.00,   0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.091593087193     
+ ==============================================================
+ noel =            1  npt =            1  number =           28
+ ==============================================================
+ sigma : 
+Row 1: [100.27,  -0.00,   0.00]
+Row 2: [ -0.00, 100.00,  -0.00]
+Row 3: [  0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.091593069522     
+ ==============================================================
+ noel =            1  npt =            1  number =           29
+ ==============================================================
+ sigma : 
+Row 1: [100.41,  -0.00,   0.00]
+Row 2: [ -0.00, 100.00,  -0.00]
+Row 3: [  0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.137579645184     
+ ==============================================================
+ noel =            1  npt =            1  number =           30
+ ==============================================================
+ sigma : 
+Row 1: [100.41,  -0.00,  -0.00]
+Row 2: [ -0.00, 100.00,  -0.00]
+Row 3: [ -0.00,  -0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.137579605417     
+ ==============================================================
+ noel =            1  npt =            1  number =           31
+ ==============================================================
+ sigma : 
+Row 1: [100.62,  -0.00,  -0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [ -0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.206575581199     
+ ==============================================================
+ noel =            1  npt =            1  number =           32
+ ==============================================================
+ sigma : 
+Row 1: [100.62,   0.00,  -0.00]
+Row 2: [  0.00, 100.00,   0.00]
+Row 3: [ -0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.206575491702     
+ ==============================================================
+ noel =            1  npt =            1  number =           33
+ ==============================================================
+ sigma : 
+Row 1: [100.93,   0.00,  -0.00]
+Row 2: [  0.00, 100.00,   0.00]
+Row 3: [ -0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.310105706452     
+ ==============================================================
+ noel =            1  npt =            1  number =           34
+ ==============================================================
+ sigma : 
+Row 1: [100.93,  -0.00,   0.00]
+Row 2: [ -0.00, 100.00,   0.00]
+Row 3: [  0.00,   0.00, 100.00]
+ fabric : 
+  harden :   1.000000000000000E-002
+ mean =    100.310105505012     
+ ==============================================================
+ noel =            1  npt =            1  number =           35
+ ==============================================================
+container state_vars has not initialized: Condition evaluated to false Error at: source.f90: 1414
+
+
+          THE ANALYSIS IS ENDED BECAUSE OF THE PROBLEMS ENCOUNTERED
+          LOOK AT THE MSG FILE FOR THE CAUSE OF THE TERMINATION
+
+
+
+                              ANALYSIS IS ENDED
+                              WITH      1 ERROR MESSAGES ON THE MSG FILE
+                              AND       2 WARNING MESSAGES ON THE DAT FILE
+
+
+
+     JOB TIME SUMMARY
+       USER TIME (SEC)      =     0.60    
+       SYSTEM TIME (SEC)    =     0.40    
+       TOTAL CPU TIME (SEC) =      1.0    
+       WALLCLOCK TIME (SEC) =         1852

@@ -1,0 +1,19 @@
+# project name
+project(myinterface)
+
+# library
+add_library(${PROJECT_NAME}
+  umat.f90
+)
+
+# Add module directory to include path
+target_include_directories(${PROJECT_NAME}
+  PUBLIC ${CMAKE_Fortran_MODULE_DIRECTORY}
+  myutils
+  myupdate
+)
+
+# Set module output directory explicitly
+set_target_properties(${PROJECT_NAME} PROPERTIES
+  Fortran_MODULE_DIRECTORY ${CMAKE_Fortran_MODULE_DIRECTORY}
+)

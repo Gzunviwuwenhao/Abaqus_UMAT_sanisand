@@ -1,11 +1,17 @@
 !*******************************************************************************
-!> @brief math_impl
+!> @brief Math module for numerical algorithms
 !>
-!> @details 模块详细描述
+!> @details This module provides mathematical utilities including bisection method,
+!>          interval checking, and other numerical algorithms used in the UMAT.
 !>
 !> @author wuwenhao
 !> @date 2025/11/27
 !*******************************************************************************
+! #ifdef DEBUG
+! #define ENABLE_MONOTONIC_CHECK 1
+! #else
+! #define ENABLE_MONOTONIC_CHECK 0
+! #endif
 submodule(math_mod) math_impl
   use exception_mod
   use tensor_opt_mod
@@ -16,73 +22,349 @@ submodule(math_mod) math_impl
   type(Elast) elast_
   type(Plast) plast_
   type(Math) math_
+  type(Torch) :: torch_
   !
 contains
+  !*****************************************************************************
+  !> @brief Interval checking implementation
+  !>
+  !> @details This subroutine performs interval checking to find the appropriate
+  !>          scaling factor for the strain increment. It determines the right
+  !>          boundary and the scaling factor for plastic correction.
+  !>
+  !> @param[in]  shvars Shared variables (stress tensor, etc.)
+  !> @param[in]  stvars State variables (void ratio, etc.)
+  !> @param[out] rbd    Right boundary of the scaling factor (0 <= rbd <= 1)
+  !> @param[out] alout  Scaling factor for plastic correction
+  !*****************************************************************************
+  module procedure intchc_impl
+  real(DP) :: mean_etr, mean_cur
+  real(DP), dimension(3, 3) :: pfsig, dsigma
+  real(DP) :: angle, lbd
+  real(DP) :: fright, fleft, ftemp
+  real(DP) :: iter
+  !
+  mean_cur = torch_%Trace(shvars%get_sigma()) / 3.0_DP
+  mean_etr = mean_with_depsln(shvars, stvars, depsln)
+  if(mean_etr <= 0.0_DP .and. mean_cur >= 0.0_DP) then
+    ! Ensure that there is a solution within the domain.
+    rbd = Bisection_impl(shvars, stvars, depsln, mean_with_depsln, 0.0_DP, 1.0_DP, 0.0_DP)
+  else
+    rbd = 1.0_DP
+  endif
+  !
+  fleft = elast_%Yield_distance(shvars)
+  fright = ftol_with_depsln(shvars, stvars, rbd * depsln)
+  !
+  if(fleft * fright >= 0.0_DP) then
+    pfsig(:, :) = plast_%Get_pfsig(shvars)
+    dsigma(:, :) = elast_%calc_dsigma(shvars, stvars, depsln)
+    angle = torch_%Get_cost(pfsig, dsigma)
+    if(angle < 0.0_DP) then
+      iter = 0.0_DP
+      do while(iter <= 1.0_DP)
+        ftemp = ftol_with_depsln(shvars, stvars, iter * depsln)
+        if(ftemp <= -EPS) then
+          lbd = iter
+          exit
+        else
+          iter = iter + 0.01_DP
+          if(iter >= 1.0_DP) then
+            alout = 0.0_DP
+            return
+          endif
+        endif
+      enddo
+    else
+      alout = 0.0_DP
+      return
+    endif
+  else
+    lbd = 0.0_DP
+  endif
+  alout = Bisection_impl(shvars, stvars, depsln, ftol_with_depsln, lbd, rbd, 0.0_DP)
+  !
+  end procedure intchc_impl
+  !*****************************************************************************
+  !> @brief Bisection method implementation
+  !>
+  !> @details This function implements the bisection method to find the root of
+  !>          a function within a given interval [lbd, rbd]. The function must
+  !>          have opposite signs at the boundaries. Monotonicity check can be
+  !>          enabled in debug mode.
+  !>
+  !> @param[in] shvars   Shared variables (stress tensor, etc.)
+  !> @param[in] stvars   State variables (void ratio, etc.)
+  !> @param[in] func     Function to find root of (conforms to func_with_param)
+  !> @param[in] lbd      Left boundary of the interval
+  !> @param[in] rbd      Right boundary of the interval
+  !> @param[in] condition Target value (usually 0 for root finding)
+  !> @return alout       Root found within the interval
+  !*****************************************************************************
   module procedure Bisection_impl
-  type(Share_var) :: shvars0, shvars1, shvarsm
-  real(DP) :: fleft, fright, fmid
-  real(DP) :: mid, left, right, precision
-  real(DP), dimension(3, 3, 3, 3) :: stiff
-  real(DP), dimension(3, 3) :: dsigma, dsige0, dsige1, dsigem
-  real(DP), dimension(3, 3) :: sigmae
-  integer :: iter, iter_max
+  real(DP) :: left, right, mid
+  real(DP) :: f_left, f_right, f_mid
+  real(DP) :: df_left, df_right, df_mid
+  integer :: it, it_max
+  logical :: monotonic
   !-----------------------------------------------------------------------------
-  left = alpha0
-  right = alpha1
-  ! initial vars
-  iter_max = 100
-  precision = 1.0D-8
-  shvars0 = shvars
-  shvars1 = shvars
-  shvarsm = shvars
-  ! check
+  left = lbd
+  right = rbd
+  it_max = 100
+  !check input variable
   CHECK_TRUE(left >= 0.0_DP .and. right <= 1.0_DP, "left and right should be in [0,1]")
   CHECK_TRUE(left < right, "The interval can not be emptied.")
   !
-  stiff = elast_%Get_stiffness(shvars, voidr)
-  dsigma = stiff.ddot.depsln
-  dsige0 = left * dsigma
-  dsige1 = right * dsigma
-  ! update
-  call shvars0%update_sigma(dsige0)
-  call shvars1%update_sigma(dsige1)
-  ! calculate ftol
-  fleft = elast_%Yield_distance(shvars0)
-  fright = elast_%Yield_distance(shvars1)
-  CHECK_TRUE(fleft * fright < 0.0_DP, "ValueError:The interval [ a, b ]")
+  f_left = func(shvars, stvars, left * depsln)
+  f_right = func(shvars, stvars, right * depsln)
   !
-  if(abs(fright) <= EPS) then
-    alout = right
-    return
-  endif
-  if(abs(fleft) <= EPS) then
-    alout = left
-    return
-  endif
-  !
-  do iter = 1, iter_max
+  CHECK_TRUE(f_left * f_right <= 0.0_DP, " Bisection_impl: The function must have different signs at the boundaries.")
+  ! monotonic
+  ! if(ENABLE_MONOTONIC_CHECK == 1) then
+  !   monotonic = is_monotonic(shvars, stvars, depsln, func, left, right)
+  !   CHECK_TRUE(monotonic, "func must be monotonic")
+  ! endif
+  ! iterator
+  do it = 1, it_max
     mid = left + (right - left) / 2.0_DP
-    dsigem = mid * dsigma
-    sigmae(:, :) = shvars%get_sigma() + dsigem(:, :)
-    call shvarsm%changed_sigma(sigmae)
-    fmid = elast_%Yield_distance(shvarsm)
-    ! 检查是否收敛
-    if(abs(fmid) <= precision .or. (right - left) <= precision) then
+    f_mid = func(shvars, stvars, mid * depsln)
+    df_mid = f_mid - condition
+    df_left = f_left - condition
+    df_right = f_right - condition
+    if(abs(df_mid) <= eps) then
       alout = mid
       return
     endif
-    if(fleft * fmid < 0.0_DP) then
-      right = mid
-      fright = fmid
-    else
+    if(df_left * df_mid >= 0.0_DP) then
       left = mid
-      fleft = fmid
+      f_left = f_mid
+    else
+      right = mid
+      f_right = f_mid
     endif
   enddo
   end procedure Bisection_impl
+  !*****************************************************************************
+  module procedure Onyield_impl
+  type(Share_var) :: shtmp, Defor, Desec, shfor, shdrt
+  type(State_var) :: sttmp, stfor, sttmp, stdrt
+  real(DP), dimension(3, 3, 3, 3) :: dempx1, dempx2
+  integer :: it, nfail
+  real(DP) :: dt, t, sstol, rtol, beta, fupd
+  logical :: converged
+  !-----------------------------------------------------------------------------
+  ! initialize variable
+  dt = 1.0_DP
+  t = 0.0_DP
+  dempx = 0.0_DP
+  shvar_upd = shvars
+  stvar_upd = stvars
+  sstol = 1.0D-6
+  converged = .false.
   !
-  module procedure left_bound_impl
-  end procedure left_bound_impl
-  module procedure right_bound_impl
-  end procedure right_bound_impl
+  do it = 1, 200
+    call plast_%Elstop(shvar_upd, stvar_upd, dt * depsln, Defor, dempx1)
+    shfor = shvar_upd + Defor
+    stfor = stvar_upd
+    if(shfor%is_low()) then
+      if(dt <= EPS) then
+        exit
+      else
+        dt = dt / 2.0_DP
+        cycle
+      endif
+    endif
+    call plast_%Elstop(shfor, stfor, dt * depsln, Desec, dempx2)
+    shtmp = shvars + (Defor + Desec) / 2.0_DP
+    call sttmp%update_voidr(depsln)
+    if(shtmp%is_low()) then
+      if(dt <= EPS) then
+        shvar_upd = shfor
+        exit
+      else
+        dt = dt / 2.0_DP
+        cycle
+      endif
+    endif
+    !
+    rtol = Get_residual_impl(Defor, Desec, shtmp)
+    beta = 0.8 * dsqrt(sstol / rtol)
+    !
+    if(rtol <= sstol) then
+      fupd = elast_%Yield_distance(shtmp)
+      ! revise
+      if(abs(fupd) > EPS) then
+        call drift_shvars_impl(shtmp, sttmp, depsln, shdrt, stdrt)
+      endif
+      ! update time
+      t = t + dt
+      ! update variable
+      shvar_upd = shtmp
+      stvar_upd = sttmp
+      dempx = dempx + ((dempx1 + dempx2) / 2.0_DP) * dt
+      ! exit
+      if(abs(1.0_DP - t) <= EPS) then
+        converged = .true.
+        exit
+      endif
+      ! the next dt
+      select case(nfail)
+      case(1)
+        dt = min(beta * dt, dt, 1.0D0 - t)
+      case(0)
+        dt = min(beta * dt, 1.1d0 * dt, 1.0D0 - t)
+      endselect
+    else
+      ! update fail
+      nfail = 1
+      ! the next dt
+      dt = max(beta * dt, 1.0D-3, 0.1 * dt)
+    endif
+  enddo
+  !
+  if(.not. converged) then
+    ! 迭代失败
+    call stvar_upd%changed_pnewdt(0.5d0)
+    write(7, *) "too many attempt made for the increment of stress"
+    write(7, *) "total time=", t, "current increment time=", dt, &
+      "sstol=", sstol, "rtol=", rtol
+    return
+  endif
+  ! 应力太小
+  if(shvar_upd%is_low()) then
+    !
+    return
+  endif
+  !
+  return
+  end procedure Onyield_impl
+  !*****************************************************************************
+  module procedure Get_residual_impl
+  type(Share_var) :: sh_dif
+  real(DP), dimension(3) :: norm_dif, norm_tmg, vartol
+  !-----------------------------------------------------------------------------
+  sh_dif = shfor - shsec
+  norm_dif = sh_dif%norm()
+  norm_tmg = shtmp%norm()
+  where(norm_tmg < EPS)
+    norm_tmg = EPS
+  endwhere
+  !
+  vartol = norm_dif / 2.0_DP / norm_tmg
+  residual = max(maxval(vartol), EPS)
+  end procedure Get_residual_impl
+  !*****************************************************************************
+  !> @brief : drift_shvars_impl
+  !
+  !> @param[in] shtmp
+  !> @param[in] sttmp
+  !> @param[in] depsln
+  !> @param[out] shdrt
+  !> @param[out] stdrt
+  !*****************************************************************************
+  module procedure drift_shvars_impl
+  real(DP) :: pfsig(3, 3), xm(3, 3), Dkp, dnmetr, frnde
+  real(DP) :: Rh, Rf(3, 3), dftol_pre, dlamda
+  real(DP), dimension(3, 3, 3, 3) :: stiff
+  integer :: it
+  !-----------------------------------------------------------------------------
+  shdrt = shtmp
+  stdrt = stdrt
+  do it = 1, 8
+    dftol_pre = elast_%Yield_distance(shdrt)
+    stiff = elast_%Get_stiffness(shdrt, stdrt)
+    pfsig = plast_%Get_pfsig(shdrt)
+    xm = plast_%Get_pgsig(shdrt, stdrt)
+    Dkp = plast_%Get_Dkp(shdrt, stdrt)
+    dnmetr = sum(pfsig * (stiff.ddot.xm))
+    frnde = dnmetr + Dkp
+    if(abs(frnde) <= EPS) frnde = sign(frnde, EPS)
+    !
+    dlamda = dftol_pre / frnde
+    !
+    call plast_%Get_evolution(shdrt, stdrt, Rh, Rf)
+    call shdrt%update_shvars(dlamda * rh,)
+    !
+  enddo
+  end procedure drift_shvars_impl
+  !*****************************************************************************
+  !> @brief Yield distance with strain increment
+  !>
+  !> @details This function calculates the yield distance after applying a
+  !>          scaled strain increment. It computes the stress increment from
+  !>          the strain increment using the elasticity tensor, updates the
+  !>          stress, and returns the yield distance.
+  !>
+  !> @param[in] shvars    Shared variables (stress tensor, etc.)
+  !> @param[in] stvars    State variables (void ratio, etc.)
+  !> @param[in] amplitude Scaling factor for the strain increment
+  !> @return ftol         Yield distance after applying scaled strain increment
+  !*****************************************************************************
+  module procedure ftol_with_depsln
+  real(DP), dimension(3, 3, 3, 3) :: stiff
+  real(DP), dimension(3, 3) :: dsigma
+  type(Share_var) :: sh_temp
+  stiff = elast_%Get_stiffness(shvars, stvars)
+  dsigma(:, :) = stiff.ddot.depsln
+  sh_temp = shvars
+  call sh_temp%update_sigma(dsigma)
+  ftol = elast_%Yield_distance(sh_temp)
+  end procedure ftol_with_depsln
+  !*****************************************************************************
+  !> @brief Mean stress with strain increment
+  !>
+  !> @details This function calculates the mean stress after applying a
+  !>          scaled strain increment. It computes the stress increment from
+  !>          the strain increment using the elasticity tensor, updates the
+  !>          stress, and returns the mean stress (trace/3).
+  !>
+  !> @param[in] shvars    Shared variables (stress tensor, etc.)
+  !> @param[in] stvars    State variables (void ratio, etc.)
+  !> @param[in] amplitude Scaling factor for the strain increment
+  !> @return res          Mean stress after applying scaled strain increment
+  !*****************************************************************************
+  module procedure mean_with_depsln
+  real(DP), dimension(3, 3, 3, 3) :: stiff
+  real(DP), dimension(3, 3) :: dsigma
+  type(Share_var) :: sh_temp
+  !
+  stiff = elast_%Get_stiffness(shvars, stvars)
+  dsigma = stiff.ddot.depsln
+  sh_temp = shvars
+  call sh_temp%update_sigma(dsigma(:, :))
+  res = torch_%Trace(sh_temp%get_sigma()) / 3.0_DP
+  end procedure mean_with_depsln
+  !*****************************************************************************
+  !> @brief Monotonicity check for a function
+  !>
+  !> @details This function checks whether a given function is monotonic
+  !>          (either non-decreasing or non-increasing) within the interval
+  !>          [lbd, rbd]. It samples the function at multiple points and
+  !>          verifies monotonic behavior.
+  !>
+  !> @param[in] shvars Shared variables (stress tensor, etc.)
+  !> @param[in] stvars State variables (void ratio, etc.)
+  !> @param[in] func   Function to check (conforms to func_with_param)
+  !> @param[in] lbd    Left boundary of the interval
+  !> @param[in] rbd    Right boundary of the interval
+  !> @return           .true. if function is monotonic, .false. otherwise
+  !*****************************************************************************
+  module procedure is_monotonic
+  real(DP) :: x1, x2, f1, f2
+  integer :: i, n_samples
+  logical :: increasing = .true.
+  logical :: decreasing = .true.
+  n_samples = 10  ! 采样点数
+  do i = 1, n_samples
+    x1 = lbd + (rbd - lbd) * (i - 1) / real(n_samples, DP)
+    x2 = lbd + (rbd - lbd) * i / real(n_samples, DP)
+
+    f1 = func(shvars, stvars, x1 * depsln)
+    f2 = func(shvars, stvars, x2 * depsln)
+    if(f2 < f1) increasing = .false.
+    if(f2 > f1) decreasing = .false.
+  enddo
+  is_monotonic = increasing .or. decreasing
+  end procedure is_monotonic
+!*******************************************************************************
 endsubmodule math_impl

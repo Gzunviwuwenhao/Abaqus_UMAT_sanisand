@@ -8,7 +8,7 @@
 !*******************************************************************************
 module plastic_mod
   use Base_config, only: DP
-  use share_vars, only: Share_var
+  use Container_mod
   implicit none
   private
   type, public :: plast
@@ -19,7 +19,7 @@ module plastic_mod
     procedure, public, nopass :: Get_dilatancy => Get_dilatancy_impl
     procedure, public, nopass :: Get_evolution => Get_evolution_impl
     procedure, public, nopass :: Get_Dkp => Get_Dkp_impl
-    ! procedure, public, nopass :: Get_lamda => Get_lamda_impl
+    procedure, public, nopass :: Elstop => Elstop_impl
   endtype plast
   !
   interface
@@ -35,7 +35,7 @@ module plastic_mod
     !> @return 返回值说明
     !***************************************************************************
     module function Get_pfsig_impl(shvars) result(pFsig)
-      type(Share_var) :: shvars
+      type(Share_var), intent(in) :: shvars
       real(DP), dimension(3, 3) :: pFsig
     endfunction Get_pfsig_impl
     !***************************************************************************
@@ -49,11 +49,11 @@ module plastic_mod
     !>
     !> @return 返回值说明
     !***************************************************************************
-    module function Get_pgsig_impl(shvars, voidr) result(xm)
+    module function Get_pgsig_impl(shvars, stvars) result(pgsig)
       implicit none
-      type(Share_var) :: shvars
-      real(DP), intent(in) :: voidr
-      real(DP), dimension(3, 3) :: xm
+      type(Share_var), intent(in) :: shvars
+      type(State_var), intent(in) :: stvars
+      real(DP), dimension(3, 3) :: pgsig
     endfunction Get_pgsig_impl
     !***************************************************************************
     !> @brief Get_psim_impl
@@ -67,10 +67,10 @@ module plastic_mod
     !>
     !> @return 返回值说明
     !***************************************************************************
-    module function Get_psim_impl(shvars, voidr) result(psim)
+    module function Get_psim_impl(shvars, stvars) result(psim)
       ! input
-      type(Share_var) :: shvars
-      real(DP), intent(in) :: voidr
+      type(Share_var), intent(in) :: shvars
+      type(State_var), intent(in) :: stvars
       ! output
       real(DP) :: psim
     endfunction Get_psim_impl
@@ -86,9 +86,9 @@ module plastic_mod
     !>
     !> @return 返回值说明
     !***************************************************************************
-    module function Get_dilatancy_impl(shvars, voidr) result(dpla)
-      type(Share_var) :: shvars
-      real(DP), intent(in) :: voidr
+    module function Get_dilatancy_impl(shvars, stvars) result(dpla)
+      type(Share_var), intent(in) :: shvars
+      type(State_var), intent(in) :: stvars
       real(DP) :: dpla
     endfunction Get_dilatancy_impl
     !***************************************************************************
@@ -103,21 +103,27 @@ module plastic_mod
     !>
     !> @return 返回值说明
     !***************************************************************************
-    module subroutine Get_evolution_impl(shvars, voidr, Rh, RF)
-      type(Share_var) :: shvars
-      real(DP), intent(in) :: voidr
+    module subroutine Get_evolution_impl(shvars, stvars, Rh, RF)
+      type(Share_var), intent(in) :: shvars
+      type(State_var), intent(in) :: stvars
       real(DP) :: Rh, RF(3, 3)
     endsubroutine Get_evolution_impl
-
+    !
+    module function Get_Dkp_impl(shvars, stvars) result(Dkp)
+      type(Share_var), intent(in) :: shvars
+      type(State_var), intent(in) :: stvars
+      real(DP) :: Dkp
+    endfunction Get_Dkp_impl
+    !
+    module subroutine Elstop_impl(shvars, stvars, depsln, Rshvars, dempx)
+      type(Share_var), intent(in) :: shvars
+      type(State_var), intent(in) :: stvars
+      real(DP), dimension(3, 3), intent(in) :: depsln
+      type(Share_var), intent(out) :: Rshvars
+      real(DP), dimension(3, 3, 3, 3), intent(out) :: dempx
+    endsubroutine Elstop_impl
+    !
   endinterface ! end interface
 contains
-  function Get_Dkp_impl(shvars, voidr) result(Dkp)
-    type(Share_var) :: shvars
-    real(DP), intent(in) :: voidr
-    real(DP) :: Dkp, RH, RF(3, 3)
-    type(plast) plast_
-    !
-    call plast_%Get_evolution(shvars, voidr, RH, RF)
-    Dkp = RH
-  endfunction Get_Dkp_impl
+!*******************************************************************************
 endmodule plastic_mod

@@ -10,8 +10,9 @@
 module presolve_mod
   use Base_config, only: DP
   implicit none
-  public :: Convert_array_to_tensor, Convert_tensor_to_array, Print_array, Get_rotation_matrix
-  public :: abaqus_debug
+  public :: Convert_array_to_tensor, Convert_tensor_to_array, Print_array
+  public :: Convert_tensor4_to_tensor2
+  public :: abaqus_debug, Get_rotation_matrix
   private
   ! Public interface
   interface
@@ -47,6 +48,11 @@ module presolve_mod
       integer, intent(in), optional :: scalar
       real(DP), dimension(size) :: array
     endfunction Convert_tensor_to_array
+    module function Convert_tensor4_to_tensor2(tensor4, size) result(tensor2)
+      real(DP), dimension(3, 3, 3, 3), intent(in) :: tensor4
+      integer, intent(in) :: size
+      real(DP), dimension(size, size) :: tensor2
+    endfunction Convert_tensor4_to_tensor2
     module function Get_rotation_matrix(angle, axis) result(rot_matrix)
       real(DP), intent(in) :: angle
       real(DP), intent(in), dimension(3) :: axis
@@ -59,7 +65,7 @@ module presolve_mod
     ! abaqus_debug
     module subroutine abaqus_debug(noel_num, npt_num, num, noel, npt, iteration, names)
       integer, intent(in) :: noel_num, npt_num, num
-      integer, intent(in) :: noel, npt,iteration
+      integer, intent(in) :: noel, npt, iteration
       character(len=*), intent(in) :: names
     endsubroutine abaqus_debug
   endinterface ! end interface

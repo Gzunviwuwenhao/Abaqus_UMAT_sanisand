@@ -1,5 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
+rem --- 设置UTF-8输出编码 ---
+powershell -Command "$OutputEncoding = [Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)"
 rem --- 1) 启动 VS2022 vcvars，以 v140 模拟 VC++14.0 ---
 @REM call  "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
 call  "E:\VS2022\VC\Auxiliary\Build\vcvars64.bat" x64
@@ -12,7 +14,12 @@ set "VSCMD_ARG_HOST_ARCH=x64"
 set "VSCMD_ARG_TGT_ARCH=x64"
 set "Platform=x64"
 rem --- 3) 把项目 include/lib 路径放到环境变量前面，确保编译器能找到你的头与兼容的 VC/SDK 头 ---
-set "PROJECT_SOURCE_DIR=F:\vscode\Abaqus_UMAT_sanisand"
+rem 自动获取项目根目录（umat.bat所在目录的父目录）
+set "SCRIPT_DIR=%~dp0"
+set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
+set "PROJECT_SOURCE_DIR=%SCRIPT_DIR%\.."
+cd /d "%PROJECT_SOURCE_DIR%"
+set "PROJECT_SOURCE_DIR=%cd%"
 set "PROJECT_INCLUDE=%PROJECT_SOURCE_DIR%\build-vs2022\include\Release"
 rem --- detect latest Windows Kits 10 include version and set include/lib paths ---
 set "WINDOWS_VC_INCLUDE=C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include"
@@ -69,8 +76,8 @@ if defined WIN_KIT_VER (
   set "LIB=!LIB!;!PROJECT_LIB!"
 ) else (
 	echo [回退路径 - 未找到 Windows SDK]
-	set "INCLUDE=F:\vscode\umat_cpp_tensor\include;F:\vscode\umat_cpp_tensor\include\utils;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include"
-	set "LIB=F:\vscode\umat_cpp_tensor\lib;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\lib\amd64"
+	set "INCLUDE=%PROJECT_SOURCE_DIR%\include;%PROJECT_SOURCE_DIR%\include\utils;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include"
+	set "LIB=%PROJECT_SOURCE_DIR%\lib;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\lib\amd64"
 )
 echo.
 echo [最终环境变量]
@@ -97,23 +104,23 @@ echo.
 echo ================================================
 echo 合并源文件
 echo ================================================
-call "F:\vscode\Abaqus_UMAT_sanisand\scripts\merge_fortran.bat"
+call "%PROJECT_SOURCE_DIR%\scripts\merge_fortran.bat"
 
 rem --- 5) 删除旧的编译文件 ---
 echo.
 echo ================================================
 echo 清理旧的编译文件
 echo ================================================
-if exist "F:\vscode\Abaqus_UMAT_sanisand\source-std.obj" (
+if exist "%PROJECT_SOURCE_DIR%\source-std.obj" (
     echo 删除 source-std.obj...
-    del "F:\vscode\Abaqus_UMAT_sanisand\source-std.obj"
+    del "%PROJECT_SOURCE_DIR%\source-std.obj"
 ) else (
     echo source-std.obj 不存在，无需删除
 )
 
-if exist "F:\vscode\Abaqus_UMAT_sanisand\standardU.dll" (
+if exist "%PROJECT_SOURCE_DIR%\standardU.dll" (
     echo 删除 standardU.dll...
-    del "F:\vscode\Abaqus_UMAT_sanisand\standardU.dll"
+    del "%PROJECT_SOURCE_DIR%\standardU.dll"
 ) else (
     echo standardU.dll 不存在，无需删除
 )

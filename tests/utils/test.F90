@@ -31,7 +31,7 @@
 program test
   ! Preprocessor macros
   ! use modules
-  use base_config, only: data_t, delta,sp
+  use base_config
   use tensor_opt_mod
   use presolve_mod
   use exception_mod
@@ -39,10 +39,10 @@ program test
   ! declaration variable
   implicit none
   type(Torch) :: opt_
-  real(data_t), dimension(3, 3) :: stress, S_ref, S, R_ref, R, temp
-  real(data_t) :: array1(3), array2(4), array3(6)
-  real(data_t), dimension(3, 3) :: tensor1, tensor2, tensor3
-  real(data_t) :: mean, p, J2, J3, J2_ref, J3_ref, sin3t, sin3t_ref
+  real(DP), dimension(3, 3) :: stress, S_ref, S, R_ref, R, temp
+  real(DP) :: array1(3), array2(4), array3(6)
+  real(DP), dimension(3, 3) :: tensor1, tensor2, tensor3
+  real(DP) :: mean, p, J2, J3, J2_ref, J3_ref, sin3t, sin3t_ref
   integer :: i, j
   ! random_number
   integer :: seed_size
@@ -96,8 +96,8 @@ program test
   CHECK_FLOAT_EQUAL(sin3t, sin3t_ref, " sin3t vertify")
   !
   tensor1 = convert_array_to_tensor(array1)
-  tensor2 = convert_array_to_tensor(array2,2.0d0)
-  tensor3 = convert_array_to_tensor(array3,2.0d0)
+  tensor2 = convert_array_to_tensor(array2, 2.0d0)
+  tensor3 = convert_array_to_tensor(array3, 2.0d0)
   call print_array(array1)
   call opt_%Print(tensor1)
 

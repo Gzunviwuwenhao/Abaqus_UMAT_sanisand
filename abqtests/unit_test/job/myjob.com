@@ -1,5 +1,5 @@
 from driverConstants import *
-from driverStandardMPI import StandardMPIAnalysis
+from driverStandard import StandardAnalysis
 import driverUtils, sys
 options = {
     'SIMExt':'.sim',
@@ -18,7 +18,6 @@ options = {
     'contact':OFF,
     'cosimulation':OFF,
     'coupledProcedure':OFF,
-    'cpus':14,
     'cpusValidated':True,
     'cse':OFF,
     'cyclicSymmetryModel':OFF,
@@ -59,7 +58,7 @@ options = {
     'interactive':None,
     'interpolExtList':['.odb', '.sim', '.SMAManifest'],
     'jleJobExcluded':False,
-    'job':'Jobtest',
+    'job':'myjob',
     'keyword_licenses':[],
     'lanczos':OFF,
     'libs':[],
@@ -69,13 +68,8 @@ options = {
     'modifiedTet':OFF,
     'moldflowFiles':[],
     'moldflowMaterial':OFF,
-    'mp_file_system':(DETECT, DETECT),
-    'mp_head_node':('desktop-jrock0a.lan', 'desktop-jrock0a', '192.168.110.208'),
-    'mp_host_list':(('desktop-jrock0a', 14),),
-    'mp_mode':MPI,
+    'mp_mode':THREADS,
     'mp_mode_requested':MPI,
-    'mp_mpi_validate':OFF,
-    'mp_rsh_command':'dummy %H -l wwh -n %C',
     'multiphysics':OFF,
     'noDmpDirect':[],
     'noMultiHost':[],
@@ -86,6 +80,7 @@ options = {
     'numNodes':0,
     'onestepinverse':OFF,
     'outputKeywords':ON,
+    'output_precision':FULL,
     'parameterized':OFF,
     'partsAndAssemblies':ON,
     'parval':OFF,
@@ -125,15 +120,15 @@ options = {
     'symmetricResultsTransfer':OFF,
     'tempNoInterpolExtList':['.fil', '.odb', '.sim', '.SMAManifest'],
     'thermal':OFF,
-    'tmpdir':'F:\\scratch',
+    'tmpdir':'C:\\Users\\wwh1998\\AppData\\Local\\Temp',
     'tracer':OFF,
     'transientSensitivity':OFF,
     'unfold_param':OFF,
     'unsymm':ON,
-    'user':'./../source.f90',
+    'user':'./../../../merge/source.f90',
     'visco':OFF,
     'xplSelect':OFF,
 }
-analysis = StandardMPIAnalysis(options)
+analysis = StandardAnalysis(options)
 status = analysis.run()
 sys.exit(status)

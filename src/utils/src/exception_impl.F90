@@ -46,8 +46,8 @@ contains
   write(full_msg, '(A,": ", A, " Error at: ",A, ": ",I0)') &
     this%prefix_, msg, this%file_, this%line_
   ! 在标准环境中使用单元0输出到标准错误
-  write(0, '(A)') trim(full_msg)
-  call exit(1)
+  write(6, '(A)') trim(full_msg)
+  call xit
   end procedure throw_error_impl
   !*****************************************************************************
   !> @brief ASSERT_TRUE
