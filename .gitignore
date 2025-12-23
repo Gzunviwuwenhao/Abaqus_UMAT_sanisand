@@ -43,7 +43,7 @@
 # vscode settings
 .vscode/
 # idea
-.idea/
+/.idea/
 # camke build folders
 /build-ninja
 /build-vs2022
