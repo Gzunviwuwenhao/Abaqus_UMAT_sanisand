@@ -37,6 +37,7 @@ module tensor_opt_mod
     procedure, public, nopass :: Norm => Norm_impl
     procedure, public, nopass :: Get_cost => Get_cost_impl
     procedure, public, nopass :: Get_Rm => Get_Rm_impl
+    procedure, public, nopass :: Get_unit_devivator => Get_unit_devivator_impl
   endtype Torch
   !
   interface operator(.ddot.)
@@ -81,18 +82,28 @@ module tensor_opt_mod
       real(DP), dimension(3, 3) :: res
     endfunction Tensor2_ddot_tensor4
     !***************************************************************************
+    !> @brief Dyadic product of two second-order tensors
+    !>
+    !> @details Calculate the dyadic (outer) product of two second-order
+    !> tensors, resulting in a fourth-order tensor.
+    !>
+    !> @param[in]  tensorA First second-order tensor
+    !> @param[in]  tensorB Second second-order tensor
+    !>
+    !> @return Fourth-order tensor result
+    !***************************************************************************
     module function Tensor2_dyad_tensor2(tensorA, tensorB) result(res)
       real(DP), dimension(3, 3), intent(in) :: tensorA
       real(DP), dimension(3, 3), intent(in) :: tensorB
       real(DP), dimension(3, 3, 3, 3) :: res
     endfunction Tensor2_dyad_tensor2
     !***************************************************************************
-    !> @brief Print_Impl
+    !> @brief Print tensor
     !>
-    !> @details Print a stress tensor
+    !> @details Print the components of a 3x3 tensor to standard output
+    !> in matrix format for debugging and visualization.
     !>
-    !> @param[in]  stress  Stress tensor to print
-    !
+    !> @param[in]  tensor  3x3 tensor to print
     !***************************************************************************
     module Subroutine Print_Impl(tensor)
       real(DP), intent(in), dimension(3, 3) :: tensor
@@ -189,41 +200,76 @@ module tensor_opt_mod
       real(DP) :: res
     endfunction Shear_impl
     !***************************************************************************
-    !> @brief Normalize_impl
+    !> @brief Normalize tensor
     !>
-    !> @details Calculate the normalize of the tensor
+    !> @details Normalize a tensor by dividing by its Frobenius norm,
+    !> resulting in a unit tensor with the same direction.
     !>
-    !> @param[in]  a 3x3 size of tensor
+    !> @param[in]  tensor  Input 3x3 tensor
     !>
-    !> @return Normalized tensor
+    !> @return Normalized unit tensor
     !***************************************************************************
     module function Normalize_impl(tensor) result(res)
       real(DP), dimension(3, 3), intent(in) :: tensor
       real(DP), dimension(3, 3) :: res
     endfunction Normalize_impl
     !***************************************************************************
-    !> @brief Normalize_impl
+    !> @brief Calculate tensor norm
     !>
-    !> @details Calculate the normalize of the tensor
+    !> @details Calculate the Frobenius norm (Euclidean norm) of a 3x3 tensor.
     !>
-    !> @param[in]  a 3x3 size of tensor
+    !> @param[in]  tensor  Input 3x3 tensor
     !>
-    !> @return the norm of tensor
+    !> @return Frobenius norm of the tensor
     !***************************************************************************
     module function Norm_impl(tensor) result(res)
       real(DP), dimension(3, 3), intent(in) :: tensor
       real(DP) :: res
     endfunction Norm_impl
     !***************************************************************************
+    !> @brief Calculate cosine of angle between tensors
+    !>
+    !> @details Calculate the cosine of the angle between two tensors
+    !> using their double dot product and norms.
+    !>
+    !> @param[in]  tensorA  First 3x3 tensor
+    !> @param[in]  tensorB  Second 3x3 tensor
+    !>
+    !> @return Cosine of angle between tensors
+    !***************************************************************************
     module function Get_cost_impl(tensorA, tensorB) result(val)
       real(DP), dimension(3, 3), intent(in) :: tensorA
       real(DP), dimension(3, 3), intent(in) :: tensorB
       real(DP) :: val
     endfunction Get_cost_impl
+    !***************************************************************************
+    !> @brief Calculate R_m parameter
+    !>
+    !> @details Calculate the R_m parameter used in critical state soil
+    !> mechanics, related to the Lode angle and stress invariants.
+    !>
+    !> @param[in]  tensor  Stress tensor
+    !>
+    !> @return R_m parameter value
+    !***************************************************************************
     module function Get_Rm_impl(tensor) result(val)
       real(DP), dimension(3, 3), intent(in) :: tensor
       real(DP) :: val
     endfunction Get_Rm_impl
+    !***************************************************************************
+    !> @brief Calculate unit deviatoric tensor
+    !>
+    !> @details Calculate the unit deviatoric tensor by normalizing the
+    !> deviatoric part of a stress tensor.
+    !>
+    !> @param[in]  tensor  Input stress tensor
+    !>
+    !> @return Unit deviatoric tensor
+    !***************************************************************************
+    module function Get_unit_devivator_impl(tensor) result(res)
+      real(DP), dimension(3, 3), intent(in) :: tensor
+      real(DP), dimension(3, 3) :: res
+    endfunction Get_unit_devivator_impl
   endinterface
 contains
 !*******************************************************************************

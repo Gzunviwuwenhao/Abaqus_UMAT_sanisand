@@ -91,6 +91,7 @@ contains
   this%harden_ = this%harden_ + dharden
   this%sigma_(:, :) = this%sigma_(:, :) + dsigma(:, :)
   this%fabric_(:, :) = this%fabric_(:, :) + dfabric(:, :)
+  !
   mean = torch_%Trace(this%sigma_) / 3.0_DP
   this%is_lowstress = merge(.true., .false., mean <= EPS)
   call this%jugde_nan_inf_impl()
@@ -125,11 +126,11 @@ contains
   end procedure norm_impl
   !*****************************************************************************
   module procedure print_impl
-  write(6, *) "sigma : "
+  write(6, *) "Stress Tensor : "
   call torch_%Print(this%get_sigma())
-  write(6, *) "fabric : "
-  ! call torch_%Print(this%fabric_)
-  write(6, *) " harden : ", this%harden_
+  write(6, *) "Fabric Tensor : "
+  call torch_%Print(this%fabric_)
+  write(6, '(A12, ES13.6)') "Hardening = ", this%harden_
   end procedure print_impl
   !*****************************************************************************
   module procedure jugde_nan_inf_impl
@@ -223,7 +224,8 @@ contains
   real(DP) :: mean, scalar_
   !-----------------------------------------------------------------------------
   CHECK_TRUE(this%initialized_, "container share_vars has not initialized")
-  if(abs(scalar) < EPS) scalar_ = sign(scalar, EPS)
+  scalar_ = scalar
+  if(abs(scalar_) < EPS) scalar_ = sign(scalar_, EPS)
   res%harden_ = this%harden_ / scalar_
   res%sigma_ = this%sigma_ / scalar_
   res%fabric_ = this%fabric_ / scalar_

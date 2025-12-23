@@ -19,9 +19,9 @@ submodule(math_mod) math_impl
   use plastic_mod
 #include "macro.h"
   implicit none
-  type(Elast) elast_
-  type(Plast) plast_
-  type(Math) math_
+  type(Elast) :: elast_
+  type(Plast) :: plast_
+  type(Math) :: math_
   type(Torch) :: torch_
   !
 contains
@@ -42,13 +42,14 @@ contains
   real(DP), dimension(3, 3) :: pfsig, dsigma
   real(DP) :: angle, lbd
   real(DP) :: fright, fleft, ftemp
-  real(DP) :: iter
+  real(DP) :: iter, rbd
   !
   mean_cur = torch_%Trace(shvars%get_sigma()) / 3.0_DP
   mean_etr = mean_with_depsln(shvars, stvars, depsln)
   if(mean_etr <= 0.0_DP .and. mean_cur >= 0.0_DP) then
     ! Ensure that there is a solution within the domain.
-    rbd = Bisection_impl(shvars, stvars, depsln, mean_with_depsln, 0.0_DP, 1.0_DP, 0.0_DP)
+    rbd = Bisection_impl(shvars, stvars, depsln, mean_with_depsln, &
+                         0.0_DP, 1.0_DP, 0.0_DP, tol)
   else
     rbd = 1.0_DP
   endif
@@ -64,7 +65,7 @@ contains
       iter = 0.0_DP
       do while(iter <= 1.0_DP)
         ftemp = ftol_with_depsln(shvars, stvars, iter * depsln)
-        if(ftemp <= -EPS) then
+        if(ftemp <= -tol) then
           lbd = iter
           exit
         else
@@ -82,7 +83,8 @@ contains
   else
     lbd = 0.0_DP
   endif
-  alout = Bisection_impl(shvars, stvars, depsln, ftol_with_depsln, lbd, rbd, 0.0_DP)
+  alout = Bisection_impl(shvars, stvars, depsln, ftol_with_depsln, &
+                         lbd, rbd, 0.0_DP, tol)
   !
   end procedure intchc_impl
   !*****************************************************************************
@@ -106,7 +108,6 @@ contains
   real(DP) :: f_left, f_right, f_mid
   real(DP) :: df_left, df_right, df_mid
   integer :: it, it_max
-  logical :: monotonic
   !-----------------------------------------------------------------------------
   left = lbd
   right = rbd
@@ -118,7 +119,7 @@ contains
   f_left = func(shvars, stvars, left * depsln)
   f_right = func(shvars, stvars, right * depsln)
   !
-  CHECK_TRUE(f_left * f_right <= 0.0_DP, " Bisection_impl: The function must have different signs at the boundaries.")
+  CHECK_TRUE(f_left * f_right <= 0.0_DP, " Bisection_impl: Thefunction must have different signs at the boundaries.")
   ! monotonic
   ! if(ENABLE_MONOTONIC_CHECK == 1) then
   !   monotonic = is_monotonic(shvars, stvars, depsln, func, left, right)
@@ -131,7 +132,7 @@ contains
     df_mid = f_mid - condition
     df_left = f_left - condition
     df_right = f_right - condition
-    if(abs(df_mid) <= eps) then
+    if(abs(df_mid) <= tol) then
       alout = mid
       return
     endif
@@ -147,8 +148,8 @@ contains
   !*****************************************************************************
   module procedure Onyield_impl
   type(Share_var) :: shtmp, Defor, Desec, shfor, shdrt
-  type(State_var) :: sttmp, stfor, sttmp, stdrt
-  real(DP), dimension(3, 3, 3, 3) :: dempx1, dempx2
+  type(State_var) :: sttmp, stfor, stdrt
+  real(DP), dimension(3, 3, 3, 3) :: dempx1, dempx2, dedrt
   integer :: it, nfail
   real(DP) :: dt, t, sstol, rtol, beta, fupd
   logical :: converged
@@ -160,6 +161,7 @@ contains
   shvar_upd = shvars
   stvar_upd = stvars
   sstol = 1.0D-6
+  nfail = 0
   converged = .false.
   !
   do it = 1, 200
@@ -167,7 +169,7 @@ contains
     shfor = shvar_upd + Defor
     stfor = stvar_upd
     if(shfor%is_low()) then
-      if(dt <= EPS) then
+      if(dt <= 1.0D-6) then
         exit
       else
         dt = dt / 2.0_DP
@@ -175,10 +177,12 @@ contains
       endif
     endif
     call plast_%Elstop(shfor, stfor, dt * depsln, Desec, dempx2)
-    shtmp = shvars + (Defor + Desec) / 2.0_DP
-    call sttmp%update_voidr(depsln)
+    shtmp = shvar_upd + (Defor + Desec) / 2.0_DP
+    dempx = dempx + ((dempx1 + dempx2) / 2.0_DP) * dt
+    sttmp = stfor
+    call sttmp%update_voidr(dt * depsln)
     if(shtmp%is_low()) then
-      if(dt <= EPS) then
+      if(dt <= 1.0D-6) then
         shvar_upd = shfor
         exit
       else
@@ -193,15 +197,14 @@ contains
     if(rtol <= sstol) then
       fupd = elast_%Yield_distance(shtmp)
       ! revise
-      if(abs(fupd) > EPS) then
-        call drift_shvars_impl(shtmp, sttmp, depsln, shdrt, stdrt)
-      endif
+      call drift_shvars_impl(shtmp, sttmp, dempx, tol, &
+                             shdrt, stdrt, dedrt)
       ! update time
       t = t + dt
       ! update variable
-      shvar_upd = shtmp
-      stvar_upd = sttmp
-      dempx = dempx + ((dempx1 + dempx2) / 2.0_DP) * dt
+      shvar_upd = shdrt
+      stvar_upd = stdrt
+      dempx = dedrt
       ! exit
       if(abs(1.0_DP - t) <= EPS) then
         converged = .true.
@@ -263,29 +266,42 @@ contains
   !> @param[out] stdrt
   !*****************************************************************************
   module procedure drift_shvars_impl
-  real(DP) :: pfsig(3, 3), xm(3, 3), Dkp, dnmetr, frnde
-  real(DP) :: Rh, Rf(3, 3), dftol_pre, dlamda
-  real(DP), dimension(3, 3, 3, 3) :: stiff
+  type(Share_var) :: sh_flow, sh_radial
+  real(DP) :: dftol_pre, dftol_upd, ftol
   integer :: it
+  logical :: converged
   !-----------------------------------------------------------------------------
   shdrt = shtmp
-  stdrt = stdrt
+  stdrt = sttmp
+  dedrt = dempx
+  converged = .false.
+  ftol = elast_%Yield_distance(shdrt)
+  if(abs(ftol) <= tol) then
+    return
+  endif
+  ! iterator
   do it = 1, 8
     dftol_pre = elast_%Yield_distance(shdrt)
-    stiff = elast_%Get_stiffness(shdrt, stdrt)
-    pfsig = plast_%Get_pfsig(shdrt)
-    xm = plast_%Get_pgsig(shdrt, stdrt)
-    Dkp = plast_%Get_Dkp(shdrt, stdrt)
-    dnmetr = sum(pfsig * (stiff.ddot.xm))
-    frnde = dnmetr + Dkp
-    if(abs(frnde) <= EPS) frnde = sign(frnde, EPS)
-    !
-    dlamda = dftol_pre / frnde
-    !
-    call plast_%Get_evolution(shdrt, stdrt, Rh, Rf)
-    call shdrt%update_shvars(dlamda * rh,)
+    sh_flow = flow_direction_impl(shdrt, stdrt)
+    dftol_upd = elast_%Yield_distance(sh_flow)
+    if(abs(dftol_upd) >= abs(dftol_pre)) then
+      ! 径向返回
+      sh_radial = radial_direction_impl(shdrt, stdrt)
+      shdrt = sh_radial
+    else
+      shdrt = sh_flow
+    endif
+    ! update sucessfully
+    dftol_upd = elast_%Yield_distance(shdrt)
+    if(abs(dftol_upd) <= tol) then
+      converged = .true.
+      exit
+    endif
     !
   enddo
+  if(.not. converged) then
+    call stdrt%changed_pnewdt(0.5d0)
+  endif
   end procedure drift_shvars_impl
   !*****************************************************************************
   !> @brief Yield distance with strain increment
@@ -366,5 +382,55 @@ contains
   enddo
   is_monotonic = increasing .or. decreasing
   end procedure is_monotonic
+  !*****************************************************************************
+  !> @brief : flow_direction_impl
+  !
+  !> @param[in] shtmp
+  !> @param[in] sttmp
+  !> @param[out] res
+  !*****************************************************************************
+  module procedure flow_direction_impl
+  real(DP) :: dftol
+  real(DP) :: pfsig(3, 3), xm(3, 3), Dkp, dnmetr, frnde
+  real(DP) :: Rh, Rf(3, 3), dlamda, cbxm(3, 3)
+  real(DP), dimension(3, 3, 3, 3) :: stiff
+  !-----------------------------------------------------------------------------
+  dftol = elast_%Yield_distance(shvars)
+  stiff = elast_%Get_stiffness(shvars, stvars)
+  pfsig = plast_%Get_pfsig(shvars)
+  xm = plast_%Get_pgsig(shvars, stvars)
+  Dkp = plast_%Get_Dkp(shvars, stvars)
+  cbxm = stiff.ddot.xm
+  dnmetr = sum(pfsig * (stiff.ddot.xm))
+  frnde = dnmetr - Dkp
+  if(abs(frnde) <= EPS) frnde = sign(frnde, EPS)
+  dlamda = dftol / frnde
+  !
+  call plast_%Get_evolution(shvars, stvars, Rh, Rf)
+  res = shvars
+  call res%update_harden(dlamda * rh)
+  call res%update_sigma(-cbxm * dlamda)
+  call res%update_fabric(dlamda * Rf)
+  return
+  end procedure flow_direction_impl
+  !*****************************************************************************
+  !> @brief : flow_direction_impl
+  !
+  !> @param[in] shtmp
+  !> @param[in] sttmp
+  !> @param[out] res
+  !*****************************************************************************
+  module procedure radial_direction_impl
+  real(DP) :: dftol, dnme, dlamda
+  real(DP), dimension(3, 3) :: pfsig
+  !-----------------------------------------------------------------------------
+  dftol = elast_%Yield_distance(shvars)
+  pfsig = plast_%Get_pfsig(shvars)
+  dnme = sum(pfsig**2)
+  dlamda = dftol / dnme
+  res = shvars
+  call res%update_sigma(-dlamda * pfsig)
+  return
+  end procedure radial_direction_impl
 !*******************************************************************************
 endsubmodule math_impl

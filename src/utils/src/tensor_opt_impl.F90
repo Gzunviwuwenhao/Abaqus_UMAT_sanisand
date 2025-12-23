@@ -48,6 +48,16 @@ contains
   enddo
   end procedure Tensor2_ddot_tensor4
   !*****************************************************************************
+  !> @brief Dyadic product implementation
+  !>
+  !> @details Calculate the dyadic (outer) product of two second-order
+  !> tensors, resulting in a fourth-order tensor.
+  !>
+  !> @param[in]  tensorA  First second-order tensor (3x3)
+  !> @param[in]  tensorB  Second second-order tensor (3x3)
+  !>
+  !> @return Fourth-order tensor (3x3x3x3)
+  !*****************************************************************************
   module procedure Tensor2_dyad_tensor2
   integer :: i, j, k, l
   DO l = 1, 3
@@ -61,12 +71,12 @@ contains
   ENDDO
   end procedure Tensor2_dyad_tensor2
   !*****************************************************************************
-  !> @brief Print_Impl
+  !> @brief Print tensor implementation
   !>
-  !> @details Print a stress tensor
+  !> @details Print the components of a 3x3 tensor to standard output
+  !> in formatted matrix layout for debugging and visualization.
   !>
-  !> @param[in]  stress  Stress tensor to print
-  !
+  !> @param[in]  tensor  3x3 tensor to print
   !*****************************************************************************
   module procedure Print_impl
   integer :: i, j
@@ -104,10 +114,10 @@ contains
   !> @return Deviatoric stress tensor
   !*****************************************************************************
   module procedure Deviatoric_impl
-  real(DP) :: mean
+  real(DP) :: P
   !-----------------------------------------------------------------------------
-  mean = torch_%Trace(tensor) / 3.0_DP
-  res = tensor - mean * DELTA
+  P = torch_%Trace(tensor) / 3.0_DP
+  res = tensor - P * DELTA
   end procedure Deviatoric_impl
   !*****************************************************************************
   !> @brief Sec_dev_invar_impl
@@ -119,13 +129,13 @@ contains
   !> @return Second deviatoric invariant (J2)
   !*****************************************************************************
   module procedure Get_J2_impl
-  real(DP), dimension(3, 3) :: dev_tensor
+  real(DP), dimension(3, 3) :: S
   !-----------------------------------------------------------------------------
-  dev_tensor = torch_%Deviatoric(tensor)
-  val = sum(dev_tensor**2) / 2.0_DP
+  S = torch_%Deviatoric(tensor)
+  val = sum(S**2) / 2.0_DP
   end procedure Get_J2_impl
   !*****************************************************************************
-  !> @brief Trd_dev_invar_impl
+  !> @brief Get_J3_impl
   !>
   !> @details Calculate the third deviatoric invariant (J3) of a stress tensor
   !>
@@ -134,10 +144,10 @@ contains
   !> @return Third deviatoric invariant (J3)
   !*****************************************************************************
   module procedure Get_J3_impl
-  real(DP), dimension(3, 3) :: dev_tensor, temp
+  real(DP), dimension(3, 3) :: S, temp
   !-----------------------------------------------------------------------------
-  dev_tensor = torch_%Deviatoric(tensor)
-  temp = matmul(dev_tensor, matmul(dev_tensor, dev_tensor))
+  S = torch_%Deviatoric(tensor)
+  temp = matmul(S, matmul(S, S))
   val = torch_%Trace(temp) / 3.0_DP
   end procedure Get_J3_impl
   !*****************************************************************************
@@ -151,15 +161,15 @@ contains
   !*****************************************************************************
   module procedure Ratio_impl
   ! declaration
-  real(DP), dimension(3, 3) :: dev_tensor
-  real(DP) :: mean
+  real(DP), dimension(3, 3) :: S
+  real(DP) :: P
   ! implementation
-  mean = torch_%Trace(tensor) / 3.0_DP
-  IF(ABS(mean) .LT. eps) mean = SIGN(eps, mean)
+  P = torch_%Trace(tensor) / 3.0_DP
+  P = merge(P, sign(EPS, P), abs(P) >= EPS)
   ! deviatoric stress
-  dev_tensor = torch_%Deviatoric(tensor)
+  S = torch_%Deviatoric(tensor)
   ! return tensor
-  res = dev_tensor / mean
+  res = S / P
   end procedure Ratio_impl
   !*****************************************************************************
   !> @brief Get_sin3t_impl
@@ -171,15 +181,15 @@ contains
   !> @return sin(3θ) value
   !*****************************************************************************
   module procedure Get_sin3t_impl
-  ! declaration
   real(DP) :: J2, J3
-  ! implementation
+  !-----------------------------------------------------------------------------
   ! compute J2 and J3
   J2 = torch_%Get_J2(tensor)
-  IF(ABS(J2) .LT. eps) J2 = SIGN(eps, J2)
+  J2 = merge(J2, sign(EPS, J2), abs(J2) >= EPS)
   J3 = torch_%Get_J3(tensor)
+  !
   val = -1.5_dp * DSQRT(3.0_dp) * J3 / (J2**1.5_dp)
-  if(ABS(val) .GT. 1.0_dp) val = SIGN(1.0_dp, val)
+  val = merge(val, sign(1.0_DP, val), abs(val) <= 1.0_DP)
   end procedure Get_sin3t_impl
   !*****************************************************************************
   !> @brief Shear_impl
@@ -192,38 +202,55 @@ contains
   !*****************************************************************************
   module procedure Shear_impl
   real(DP) :: J2
+  !-----------------------------------------------------------------------------
   J2 = torch_%Get_J2(tensor)
-  res = dsqrt(three * J2)
+  res = dsqrt(3.0_DP * J2)
   end procedure Shear_impl
   !*****************************************************************************
-  !> @brief Normalize_impl
+  !> @brief Normalize tensor implementation
   !>
-  !> @details Calculate the normalize of the tensor
+  !> @details Normalize a tensor by dividing by its Frobenius norm,
+  !> resulting in a unit tensor with the same direction.
+  !> Handles near-zero norms with epsilon protection.
   !>
-  !> @param[in]  a 3x3 size of tensor
+  !> @param[in]  tensor  Input 3x3 tensor
   !>
-  !> @return Normalized tensor
+  !> @return Normalized unit tensor
   !*****************************************************************************
   module procedure Normalize_impl
   real(DP) :: norm
+  !-----------------------------------------------------------------------------
   norm = sum(tensor**2)
   norm = max(dsqrt(norm), eps)
   res(:, :) = tensor(:, :) / norm
   end procedure Normalize_impl
   !*****************************************************************************
-  !> @brief Normalize_impl
+  !> @brief Calculate tensor norm implementation
   !>
-  !> @details Calculate the normalize of the tensor
+  !> @details Calculate the Frobenius norm (Euclidean norm) of a 3x3 tensor.
+  !> Returns zero for tensors with near-zero components.
   !>
-  !> @param[in]  a 3x3 size of tensor
+  !> @param[in]  tensor  Input 3x3 tensor
   !>
-  !> @return the norm of tensor
+  !> @return Frobenius norm of the tensor
   !*****************************************************************************
   module procedure Norm_impl
   real(DP) :: temp
   temp = sum(tensor**2)
   res = max(dsqrt(temp), 0.0_DP)
   end procedure Norm_impl
+  !*****************************************************************************
+  !> @brief Calculate cosine of angle between tensors implementation
+  !>
+  !> @details Calculate the cosine of the angle between two tensors
+  !> using their double dot product and Frobenius norms.
+  !> Includes protection against division by zero and ensures
+  !> result stays within [-1, 1] range.
+  !>
+  !> @param[in]  tensorA  First 3x3 tensor
+  !> @param[in]  tensorB  Second 3x3 tensor
+  !>
+  !> @return Cosine of angle between tensors (clamped to [-1, 1])
   !*****************************************************************************
   module procedure Get_cost_impl
   real(DP) :: norm_A, norm_B, dot_product
@@ -235,13 +262,38 @@ contains
   dot_product = sum(tensorA * tensorB)
   !
   val = dot_product / (norm_A * norm_B)
-  if(abs(val) >= 1.0_dp) val = sign(1.0_dp, val)
+  val = merge(val, sign(1.0_DP, val), abs(val) <= 1.0_DP)
   end procedure Get_cost_impl
+  !*****************************************************************************
+  !> @brief Calculate R_m parameter implementation
+  !>
+  !> @details Calculate the R_m parameter used in critical state soil
+  !> mechanics. Computed as sqrt(3*J2) of the stress ratio tensor.
+  !>
+  !> @param[in]  tensor  Stress tensor
+  !>
+  !> @return R_m parameter value
   !*****************************************************************************
   module procedure Get_Rm_impl
   real(DP), dimension(3, 3) :: ratio
   ratio = torch_%Get_ratio(tensor)
   val = dsqrt(3.0_DP * torch_%Get_J2(ratio))
   end procedure Get_Rm_impl
+  !*****************************************************************************
+  !> @brief Calculate unit deviatoric tensor implementation
+  !>
+  !> @details Calculate the unit deviatoric tensor by first extracting
+  !> the deviatoric part of the stress tensor, then normalizing it.
+  !>
+  !> @param[in]  tensor  Input stress tensor
+  !>
+  !> @return Unit deviatoric tensor
+  !*****************************************************************************
+  module procedure Get_unit_devivator_impl
+  real(DP), dimension(3, 3) :: S
+  !-----------------------------------------------------------------------------
+  S = torch_%Deviatoric(tensor)
+  res = torch_%Normalize(S)
+  end procedure
 !*******************************************************************************
 endsubmodule tensor_torch_impl

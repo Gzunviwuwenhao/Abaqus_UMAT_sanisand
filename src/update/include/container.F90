@@ -1,7 +1,15 @@
 !*****************************************************************************
-!> @brief Container
+!> @brief Container module for UMAT state variables
 !>
-!> @details 模块详细描述
+!> @details
+!> This module defines container types for storing and managing state
+!> variables in ABAQUS UMAT implementations. It provides two main types:
+!> 1. Share_var: Contains hardening parameters, stress tensors, and fabric
+!>    tensors with associated update operations.
+!> 2. State_var: Contains void ratio and time increment parameters for
+!>    state-dependent calculations.
+!> The module supports arithmetic operations, assignment, and various
+!> utility functions for state variable management.
 !>
 !> @author wuwenhao
 !> @date 2025/12/07
@@ -19,7 +27,6 @@ module Container_mod
     logical :: initialized_ = .false.
     logical :: is_lowstress = .false.
     logical :: is_nan_inf = .false.
-    integer :: size
   contains
     procedure, public, pass(this) :: get_harden => get_harden_impl
     procedure, public, pass(this) :: get_sigma => get_sigma_impl

@@ -25,6 +25,17 @@ module exception_mod
 
   interface
     ! ErrorContext(std::string file, int line, std::string prefix);
+    !*****************************************************************************
+    !> @brief Create an error context object
+    !>
+    !> @details Constructs an ErrorContext object with file, line, and optional prefix
+    !>
+    !> @param[in] file Name of the source file where error occurred
+    !> @param[in] line Line number in the source file
+    !> @param[in] prefix Optional prefix message for error identification
+    !>
+    !> @return ErrorContext object containing error location information
+    !*****************************************************************************
     module function create_error_context(file, line, prefix) result(this)
       implicit none
       character(len=*), intent(in) :: file
@@ -32,13 +43,31 @@ module exception_mod
       character(len=*), intent(in), optional :: prefix
       type(ErrorContext) :: this
     endfunction create_error_context
-    ! void throw_error(std::string msg);
+    !*****************************************************************************
+    !> @brief Throw an error with context information
+    !>
+    !> @details Outputs an error message with file, line, and prefix
+    !>          information, then terminates program
+    !>
+    !> @param[in] msg Error message to display
+    !> @param[in] this ErrorContext object containing location information
+    !*****************************************************************************
     module subroutine throw_error_impl(msg, this)
       implicit none
       character(len=*), intent(in) :: msg
       class(ErrorContext), intent(in) :: this
     endsubroutine throw_error_impl
-    !
+    !*****************************************************************************
+    !> @brief Assert that a logical expression is true
+    !>
+    !> @details Checks if the expression is true, if not, throws an error
+    !>          with the provided message and location information
+    !>
+    !> @param[in] expr Logical expression to evaluate
+    !> @param[in] msg Error message to display if assertion fails
+    !> @param[in] file Name of the source file where assertion is called
+    !> @param[in] line Line number in the source file
+    !*****************************************************************************
     module subroutine ASSERT_TRUE(expr, msg, file, line)
       logical, intent(in) :: expr
       character(len=*), intent(in) :: msg
@@ -49,10 +78,18 @@ module exception_mod
   endinterface ! end interface
 contains
 
-
-
-  !
-  ! void ASSERT_EQUAL(int lhs, int rhs, std::string msg, std::string file, int line)
+  !*****************************************************************************
+  !> @brief Assert that two integer values are equal
+  !>
+  !> @details Compares two integer values, if they are not equal, throws an error
+  !>          with the provided message and location information
+  !>
+  !> @param[in] lhs Left-hand side integer value
+  !> @param[in] rhs Right-hand side integer value
+  !> @param[in] msg Error message to display if assertion fails
+  !> @param[in] file Name of the source file where assertion is called
+  !> @param[in] line Line number in the source file
+  !*****************************************************************************
   subroutine ASSERT_EQUAL(lhs, rhs, msg, file, line)
     implicit none
     ! Input/Output variables
@@ -74,16 +111,17 @@ contains
     endif
   endsubroutine ASSERT_EQUAL
   !*****************************************************************************
-  !> @brief ASSERT_FLOAT_EQUAL
+  !> @brief Assert that two floating-point values are equal within tolerance
   !>
-  !> @details 子程序详细描述
+  !> @details Compares two floating-point values, if the absolute difference
+  !>          exceeds EPS tolerance, throws an error with the provided message
+  !>          and location information
   !>
-  !> @param[in]  参数名 输入参数说明
-  !> @param[out] 参数名 输出参数说明
-  !> @param[in,out] 参数名 输入输出参数说明
-  !>
-  !> @author wuwenhao
-  !> @date 2025/12/01
+  !> @param[in] lhs Left-hand side floating-point value
+  !> @param[in] rhs Right-hand side floating-point value
+  !> @param[in] msg Error message to display if assertion fails
+  !> @param[in] file Name of the source file where assertion is called
+  !> @param[in] line Line number in the source file
   !*****************************************************************************
   subroutine ASSERT_FLOAT_EQUAL(lhs, rhs, msg, file, line)
     use Base_config, only: DP, EPS

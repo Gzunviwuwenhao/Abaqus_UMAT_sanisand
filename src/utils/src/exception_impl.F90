@@ -1,7 +1,8 @@
 !*****************************************************************************
-!> @brief tensor_opt_impl
+!> @brief Implementation of exception module procedures
 !>
-!> @details 模块详细描述
+!> @details Contains the implementation of error handling and assertion
+!>          procedures defined in the exception_mod interface
 !>
 !> @author wuwenhao
 !> @date 2025/11/27
@@ -10,12 +11,16 @@ submodule(exception_mod) exception_impl
   implicit none
 contains
   !*****************************************************************************
-  !> @brief create_error_context
+  !> @brief Create an error context object
   !>
-  !> @details 模块详细描述
+  !> @details Implementation of the ErrorContext constructor that stores
+  !>          file, line, and optional prefix information for error reporting
   !>
-  !> @author wuwenhao
-  !> @date 2025/12/01
+  !> @param[in] file Name of the source file where error occurred
+  !> @param[in] line Line number in the source file
+  !> @param[in] prefix Optional prefix message for error identification
+  !>
+  !> @return ErrorContext object containing error location information
   !*****************************************************************************
   module procedure create_error_context
   this%file_ = file
@@ -27,12 +32,14 @@ contains
   endif
   end procedure create_error_context
   !*****************************************************************************
-  !> @brief create_error_context
+  !> @brief Throw an error with context information
   !>
-  !> @details 模块详细描述
+  !> @details Implementation of error throwing procedure that formats
+  !>          and outputs an error message with file, line, and prefix
+  !>          information, then terminates the program
   !>
-  !> @author wuwenhao
-  !> @date 2025/12/01
+  !> @param[in] msg Error message to display
+  !> @param[in] this ErrorContext object containing location information
   !*****************************************************************************
   module procedure throw_error_impl
   character(len=:), allocatable :: full_msg
@@ -50,16 +57,16 @@ contains
   call xit
   end procedure throw_error_impl
   !*****************************************************************************
-  !> @brief ASSERT_TRUE
+  !> @brief Assert that a logical expression is true
   !>
-  !> @details 子程序详细描述
+  !> @details Implementation of assertion procedure that checks if the
+  !>          expression is true, if not, throws an error with the
+  !>          provided message and location information
   !>
-  !> @param[in]  参数名 输入参数说明
-  !> @param[out] 参数名 输出参数说明
-  !> @param[in,out] 参数名 输入输出参数说明
-  !>
-  !> @author wuwenhao
-  !> @date 2025/11/27
+  !> @param[in] expr Logical expression to evaluate
+  !> @param[in] msg Error message to display if assertion fails
+  !> @param[in] file Name of the source file where assertion is called
+  !> @param[in] line Line number in the source file
   !*****************************************************************************
   module procedure ASSERT_TRUE
   character(len=:), allocatable :: validator_msg

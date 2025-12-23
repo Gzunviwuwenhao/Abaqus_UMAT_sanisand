@@ -1,11 +1,22 @@
 !*****************************************************************************
-!> @brief Sigini
+!> @brief ABAQUS SIGINI subroutine for initial stress field definition
 !>
-!> @details 子程序详细描述
+!> @details This subroutine defines the initial stress field for ABAQUS
+!>          analyses. It sets up initial stress conditions based on spatial
+!>          coordinates and element/integration point information. The current
+!>          implementation provides a simple isotropic compression stress state
+!>          with equal stresses in all principal directions.
 !>
-!> @param[in]  参数名 输入参数说明
-!> @param[out] 参数名 输出参数说明
-!> @param[in,out] 参数名 输入输出参数说明
+!> @param[out] sigma    Initial stress tensor (ntens)
+!> @param[in]  coords   Spatial coordinates of integration point (ncrds)
+!> @param[in]  ntens    Size of stress/strain array
+!> @param[in]  ncrds    Number of coordinate directions
+!> @param[in]  noel     Element number
+!> @param[in]  npt      Integration point number
+!> @param[in]  layer    Layer number (for composite shells and layered solids)
+!> @param[in]  kspt     Section point number within the current layer
+!> @param[in]  lrebar   Rebar layer indicator
+!> @param[in]  names    Array of surface names (CHARACTER*80)
 !>
 !> @author wuwenhao
 !> @date 2025/12/10
