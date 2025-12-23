@@ -7,7 +7,7 @@ script_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
 # Also add the parent directory in case script is run from different location
 parent_dir = os.path.dirname(script_dir)
 # Add absolute path to scripts directory
-scripts_abs_path = r"f:/vscode/Abaqus_UMAT_sanisand/scripts"
+scripts_abs_path = r"f:/mygithub/Abaqus_UMAT_sanisand/scripts"
 sys.path.insert(0, script_dir)
 sys.path.insert(0, parent_dir)
 sys.path.insert(0, scripts_abs_path)
@@ -17,14 +17,15 @@ import time
 
 def create_model_and_inp_umat(
     condition: List[List[Union[int, float]]],
-    path_test: str,
+    model_path: str,
+    input_path : str,
     # umat_name_pre: str,
     # umat_path: str,
     model_name: str,
 ) -> None:
     """
     基于 abaqus python 接口，通过 python 文件批量生成不同工况的 abaqus 的 .cae 和 .inp 文件，并存放至相应的文件夹当中。
-    注意：使用的abaqus 2023的版本，abaqus 内置python版本为python2.7
+    注意:使用的abaqus 2023的版本,abaqus 内置python版本为python2.7
     :param model_name:
     :param rela_density:
     :param umat_path:
@@ -34,7 +35,6 @@ def create_model_and_inp_umat(
     """
     # ------------------------------------------------------------------------------------------------------------------
     # Check whether the folder exists. if it does not, create a new folder to hold the abaqus model
-    model_path = path_test + "\\" + "model"
     model_path_exists = os.path.exists(model_path)
     if not model_path_exists:
         os.makedirs(model_path)
@@ -53,7 +53,7 @@ def create_model_and_inp_umat(
         subtest_name = "test_p{P_name}_b{b_name}_Dr{Dr_name}".format(
             P_name=P, b_name=b, Dr_name=Dr
         )
-        path_subtest = path_test + "\\" + subtest_name
+        path_subtest = input_path + "\\" + subtest_name
         #
         # judge whether the folder has been created
         subtest_path_exists = os.path.exists(path_subtest)
@@ -72,7 +72,8 @@ def create_model_and_inp_umat(
 
 
 def main():
-    path_test = "F:\\vscode\\Abaqus_UMAT_sanisand\\inp"
+    module_path = "F:\\mygithub\\Abaqus_UMAT_sanisand\\model"
+    input_path  = "F:\\mygithub\\Abaqus_UMAT_sanisand\\input"
     p_condition = [100]
     b_condition = [0]
     Dr_condition = [60]
@@ -83,7 +84,7 @@ def main():
         for b in b_condition:
             for Dr in Dr_condition:
                 task_list.append([P, b, Dr])
-    create_model_and_inp_umat(task_list, path_test, model_name)
+    create_model_and_inp_umat(task_list, module_path, input_path, model_name)
 
 
 if __name__ == "__main__":

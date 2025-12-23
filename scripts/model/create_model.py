@@ -113,7 +113,7 @@ def drained_rectangular_true(
     # ------------------------------------------------------------------------------------------------------------------
     # Material
     material1 = model.Material(name="fabric_evolution_model")
-    material1.Depvar(n=35)
+    material1.Depvar(n=20)
     material1.Density(table=((2.0,),))  # type: ignore[reportUnknownArgumentType]
     material1.UserMaterial(  # type: ignore[reportUnknownArgumentType]
         mechanicalConstants=(

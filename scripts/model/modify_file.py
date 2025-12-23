@@ -11,28 +11,22 @@ def input_inp(test_path: str, inp_name: str):
     insert_str_inp = [
         '1, Voidr, "void ratio: e"\n'
         '2, Hard, "hardening parameter: HARD"\n'
-        '3, HarP, "hardening parameter: HARP"\n'
-        '4, F11, "FABRIC(1)"\n'
-        '5, F22, "FABRIC(2)"\n'
-        '6, F33, "FABRIC(3)"\n'
-        '7, F12, "FABRIC(4)"\n'
-        '8, F13, "FABRIC(5)"\n'
-        '9, F23, "FABRIC(6)"\n'
-        '10, Dncall, "dncall"\n'
-        '11, BREAK, "break"\n'
-        '12, fmag, "fmag"\n'
-        '13, ANIV, "ANISOTROPIC VARLABLE :A"\n'
-        '14, Ev, "volumetric strain"\n'
-        '15, Eq, "shear strain"\n'
-        '16, Axial_S, "axial stress"\n'
-        '17, P, "confining pressure"\n'
-        '18, Q, "deviatoric stress"\n'
-        '19, R, "Stress Ratio"\n'
-        '20, Kp1, "plastic1 modulus"\n'
-        '21, Kp2, "plastic2 modulus"\n'
-        '22, B, "Middle principal stress coefficient"\n'
-        '23, DPLA, " Dilatation1"\n'
-        '24, DPL2, " Dilatation2"\n'
+        '3, F11, "FABRIC(1)"\n'
+        '4, F22, "FABRIC(2)"\n'
+        '5, F33, "FABRIC(3)"\n'
+        '6, F12, "FABRIC(4)"\n'
+        '7, F13, "FABRIC(5)"\n'
+        '8, F23, "FABRIC(6)"\n'
+        '9, P, "confining pressure"\n'
+        '10, Q, "deviatoric stress"\n'
+        '11, R, "Stress Ratio"\n'
+        '12, Ev, "volumetric strain"\n'
+        '13, Eq, "shear strain"\n'
+        '14, ANIV, "ANISOTROPIC VARLABLE :A"\n'
+        '15, fmag, "the norm of fabric tensor"\n'
+        '16, Kp1, "plastic1 modulus"\n'
+        '17, DPLA, " Dilatation1"\n'
+        '18, Axial Stress, "axial stress"\n'
         "**\n",
         "** ----------------------------------------------------------------\n"
         "*initial conditions, type=solution, user\n"
@@ -56,8 +50,8 @@ def modify_content(
 ):
     """
     在指定文件的指定位置插入或者替代所需的字符串
-    注意：使用的abaqus 2023的版本，abaqus 内置python版本为python2.7
-    ！！！
+    注意:使用的abaqus 2023的版本,abaqus 内置python版本为python2.7
+    !!!
     :param filename: 修改的文件名！！！(这里的输入文件名必须带后缀)
     :param contents_to_search: 要搜索的内容列表
     :param new_content: 要插入或替换的新内容列表
