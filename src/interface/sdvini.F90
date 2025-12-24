@@ -1,45 +1,5 @@
 !DIR$ FREEFORM
 !*****************************************************************************
-!  Project Name
-!  Copyright (C) 2025 wuwenhao 617082766@qq.com
-!
-!  This file is part of Project Name.
-!
-!  This program is free software; you can redistribute it and/or modify
-!  it under the terms of the MIT License version 3 as
-!  published by the Free Software Foundation.
-!
-!  You should have received a copy of the MIT License
-!  along with this program. If not, see <https://mit-license.org/>.
-!
-!  @file     sdvini.F90
-!  @brief    ABAQUS SDVINI subroutine for state variable initialization
-!  @details  This file implements the SDVINI subroutine for initializing state
-!            variables in ABAQUS UMAT implementations. It sets initial values
-!            for void ratio, hardening parameters, and fabric tensors based on
-!            material configuration and spatial coordinates.
-!
-!  @author   wuwenhao
-!  @email    617082766@qq.com
-!  @version  1.0.0.1
-!  @date     2025/12/08
-!  @license  MIT Massachusetts Institute of Technology (MIT)
-!---------------------------------------------------------------------------*
-!  Remark         : A state variable array of size NSTATV to be
-!  updated by the UMAT,which includes following variables:
-!  void_ratio = statev(1) : current void ratio
-!  harden     = statev(2) : current hardening parameter
-!  Fabric_[1] = statev(3) : fabric evlution F11
-!  Fabric_[2] = statev(4) : fabric evlution F22
-!  Fabric_[3] = statev(5) : fabric evlution F33
-!  Fabric_[4] = statev(6) : fabric evlution F12,F21
-!  Fabric_[5] = statev(7) : fabric evlution F13,F31
-!  Fabric_[6] = statev(8) : fabric evlution F23,F32
-!---------------------------------------------------------------------------*
-!  Change History :
-!  <Date>     | <Version> | <Author>       | <Description>
-!  2025/12/08 | 1.0.0.1   | wuwenhao      | Create file
-!*****************************************************************************
 !> @brief ABAQUS SDVINI subroutine for state variable initialization
 !>
 !> @details This subroutine initializes state variables for the UMAT
